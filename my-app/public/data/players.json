@@ -1,0 +1,133 @@
+[
+  {
+    "id": "1",
+    "name": "Virat Kohli",
+    "country": "India",
+    "gender": "Male",
+    "type": "Batsman",
+    "team": "RCB",
+    "basePrice": 20000000,
+    "finalPrice": 150000000,
+    "photo": "/players/virat-kohli.jpg",
+    "rtmTeam": "RCB",
+    "ratings": {
+      "batting": {
+        "powerplay": 9,
+        "middleOvers": 9,
+        "deathOvers": 8
+      },
+      "bowling": {
+        "powerplay": 2,
+        "middleOvers": 3,
+        "deathOvers": 2
+      },
+      "rtmElite": 9,
+      "captaincy": 9
+    }
+  },
+  {
+    "id": "2",
+    "name": "Jasprit Bumrah",
+    "country": "India",
+    "gender": "Male",
+    "type": "Bowler",
+    "team": "MI",
+    "basePrice": 15000000,
+    "finalPrice": 120000000,
+    "photo": "/players/jasprit-bumrah.jpg",
+    "rtmTeam": "MI",
+    "ratings": {
+      "batting": {
+        "powerplay": 2,
+        "middleOvers": 2,
+        "deathOvers": 3
+      },
+      "bowling": {
+        "powerplay": 9,
+        "middleOvers": 8,
+        "deathOvers": 10
+      },
+      "rtmElite": 8,
+      "captaincy": 7
+    }
+  },
+  {
+    "id": "3",
+    "name": "MS Dhoni",
+    "country": "India",
+    "gender": "Male",
+    "type": "Wicket-keeper",
+    "team": "CSK",
+    "basePrice": 18000000,
+    "finalPrice": 140000000,
+    "photo": "/players/ms-dhoni.jpg",
+    "rtmTeam": "CSK",
+    "ratings": {
+      "batting": {
+        "powerplay": 7,
+        "middleOvers": 8,
+        "deathOvers": 10
+      },
+      "bowling": {
+        "powerplay": 1,
+        "middleOvers": 1,
+        "deathOvers": 1
+      },
+      "rtmElite": 10,
+      "captaincy": 10
+    }
+  },
+  {
+    "id": "4",
+    "name": "Rohit Sharma",
+    "country": "India",
+    "gender": "Male",
+    "type": "Batsman",
+    "team": "MI",
+    "basePrice": 19000000,
+    "finalPrice": 145000000,
+    "photo": "/players/rohit-sharma.jpg",
+    "rtmTeam": "MI",
+    "ratings": {
+      "batting": {
+        "powerplay": 9,
+        "middleOvers": 8,
+        "deathOvers": 7
+      },
+      "bowling": {
+        "powerplay": 3,
+        "middleOvers": 3,
+        "deathOvers": 2
+      },
+      "rtmElite": 9,
+      "captaincy": 9
+    }
+  },
+  {
+    "id": "5",
+    "name": "Andre Russell",
+    "country": "West Indies",
+    "gender": "Male",
+    "type": "All-rounder",
+    "team": "KKR",
+    "basePrice": 17000000,
+    "finalPrice": 130000000,
+    "photo": "/players/andre-russell.jpg",
+    "rtmTeam": "KKR",
+    "ratings": {
+      "batting": {
+        "powerplay": 8,
+        "middleOvers": 9,
+        "deathOvers": 10
+      },
+      "bowling": {
+        "powerplay": 7,
+        "middleOvers": 8,
+        "deathOvers": 9
+      },
+      "rtmElite": 8,
+      "captaincy": 7
+    }
+  }
+]
+
