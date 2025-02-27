@@ -1,20 +1,19 @@
-import express from "express"
+import express from "express";
 import {
   getPowerCards,
   createPowerCard,
   updatePowerCard,
   deletePowerCard,
-} from "../controllers/powerCardController.js"
-import { protect, admin } from "../middleware/authMiddleware.js"
+} from "../controllers/powerCardController.js";
+import { protect, admin } from "../middleware/authMiddleware.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.route("/")
-  .get(protect, getPowerCards)
-  .post(protect, admin, createPowerCard)
+router.route("/").get(getPowerCards).post(protect, admin, createPowerCard);
 
-router.route("/:id")
+router
+  .route("/:id")
   .put(protect, admin, updatePowerCard)
-  .delete(protect, admin, deletePowerCard)
+  .delete(protect, admin, deletePowerCard);
 
-export default router
+export default router;

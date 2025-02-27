@@ -5,7 +5,8 @@ import mongoose from "mongoose";
 import connectDB from "./config/db.js";
 import playerRoutes from "./routes/playerRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
-
+import userRoutes from "./routes/userRoutes.js";
+import powerCardRoutes from "./routes/powerCardRoutes.js";
 dotenv.config();
 
 mongoose.set("strictQuery", false); // Suppress Mongoose warning
@@ -24,7 +25,8 @@ app.use(express.json());
 // Routes
 app.use("/api/players", playerRoutes);
 app.use("/api/teams", teamRoutes);
-
+app.use("/api/users", userRoutes);
+app.use("/api/powerCards", powerCardRoutes);
 // ✅ Proper Global Error Handler
 app.use((err, req, res, _next) => {
   console.error("❌ Error:", err.stack);
@@ -34,17 +36,21 @@ app.use((err, req, res, _next) => {
 // ✅ Ensure Port is Free Before Listening
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-}).on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`⚠️ Port ${PORT} is already in use. Trying another port...`);
-    setTimeout(() => {
-      server.close(() => {
-        app.listen(PORT + 1, () => {
-          console.log(`✅ Server restarted on port ${PORT + 1}`);
+const server = app
+  .listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  })
+  .on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(
+        `⚠️ Port ${PORT} is already in use. Trying another port...`
+      );
+      setTimeout(() => {
+        server.close(() => {
+          app.listen(PORT + 1, () => {
+            console.log(`✅ Server restarted on port ${PORT + 1}`);
+          });
         });
-      });
-    }, 1000);
-  }
-});
+      }, 1000);
+    }
+  });
