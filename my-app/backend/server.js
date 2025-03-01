@@ -7,6 +7,7 @@ import playerRoutes from "./routes/playerRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import powerCardRoutes from "./routes/powerCardRoutes.js";
+import { login } from "./controllers/authController.js";
 dotenv.config();
 
 mongoose.set("strictQuery", false); // Suppress Mongoose warning

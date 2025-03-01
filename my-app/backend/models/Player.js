@@ -1,15 +1,13 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const playerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   country: { type: String, required: true },
   gender: { type: String, required: true },
   type: { type: String, required: true },
-  team: { type: mongoose.Schema.Types.ObjectId, ref: "Team" },
   basePrice: { type: Number, required: true },
-  finalPrice: { type: Number, required: true },
-  photo: { type: String },
-  overallRating: { type: Number, required: true },
+  finalPrice: { type: Array },
+  src: { type: String },
   ratings: {
     batting: {
       powerplay: { type: Number, required: true },
@@ -25,10 +23,7 @@ const playerSchema = new mongoose.Schema({
     captaincy: { type: Number, required: true },
   },
   rtmTeam: { type: String },
-  isLegendary: { type: Boolean, default: false },
-  isWomen: { type: Boolean, default: false },
-  isUnderdog: { type: Boolean, default: false },
-})
+  isElite: { type: Boolean, default: false },
+});
 
-export default mongoose.model("Player", playerSchema)
-
+export default mongoose.model("Player", playerSchema);

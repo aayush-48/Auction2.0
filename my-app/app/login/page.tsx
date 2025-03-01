@@ -1,33 +1,48 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-
+import type React from "react";
+import axios from "axios";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { login } from "../api/api";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 export default function Login() {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const router = useRouter()
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (username === "admin" && password === "admin123") {
-      localStorage.setItem("role", "admin")
-      router.push("/admin")
-    } else if (username === "user" && password === "user123") {
-      localStorage.setItem("role", "user")
-      router.push("/dashboard")
-    } else {
-      setError("Invalid credentials")
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      const { data } = await login(username, password);
+
+      // Save token to localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role); // Store role for redirection
+
+      // Redirect based on role
+      if (data.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || "Invalid credentials");
     }
-  }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-russian-violet to-tekhelet">
       <div className="bg-french-violet bg-opacity-30 p-8 rounded-lg shadow-lg w-96">
-        <h1 className="text-3xl font-bold mb-6 text-center text-heliotrope">Login</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center text-heliotrope">
+          Login
+        </h1>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -56,15 +71,16 @@ export default function Login() {
               required
             />
           </div>
-          <button
+          <Button
+            disabled={loading}
             type="submit"
             className="w-full bg-amethyst hover:bg-heliotrope text-white font-bold py-2 px-4 rounded transition-colors duration-300"
           >
+            {loading ? <Loader2 className="animate-spin" /> : ""}
             Login
-          </button>
+          </Button>
         </form>
       </div>
     </div>
-  )
+  );
 }
-

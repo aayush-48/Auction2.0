@@ -17,8 +17,8 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const login = (username: string, password: string, slotNumber: string) =>
-  api.post("/auth/login", { username, password, slotNumber });
+export const login = (username: string, password: string) =>
+  api.post("/users/login", { username, password, slot_number: 0 });
 
 export const getPlayers = () => api.get("/players");
 export const getPlayersByTeam = (team: string) =>
@@ -29,6 +29,8 @@ export const createPlayer = (playerData: any) =>
 export const updatePlayer = (id: string, playerData: any) =>
   api.put(`/players/${id}`, playerData);
 export const deletePlayer = (id: string) => api.delete(`/players/${id}`);
+export const assignPlayer = (id: string, teamData: any) =>
+  api.post(`/players/assign/${id}`, teamData);
 
 export const getTeams = () => api.get("/teams");
 export const getTeamById = (id: string) => api.get(`/teams/${id}`);
@@ -36,6 +38,8 @@ export const createTeam = (teamData: any) => api.post("/teams", teamData);
 export const updateTeam = (id: string, teamData: any) =>
   api.put(`/teams/${id}`, teamData);
 export const deleteTeam = (id: string) => api.delete(`/teams/${id}`);
+export const assignTeam = (id: string, teamData: any) =>
+  api.post(`/teams/assign/${id}`, teamData);
 
 export const getPowerCards = () => api.get("/powerCards");
 export const createPowerCard = (powerCardData: any) =>
@@ -45,6 +49,8 @@ export const updatePowerCard = (id: string, powerCardData: any) =>
 export const deletePowerCard = (id: string) => api.delete(`/powerCards/${id}`);
 
 export const getUsers = () => api.get("/users");
+export const updateUserPurse = (id: string, userData: any) =>
+  api.post(`/users/updateWallet/${id}`, userData);
 export const getAnalytics = () => api.get("/analytics");
 
 export default api;
