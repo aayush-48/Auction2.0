@@ -84,7 +84,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
 
     if (
       type.toLowerCase() === "batsman" ||
-      type.toLowerCase() === "wicket-keeper"
+      type.toLowerCase() === "wicket keeper"
     ) {
       const battingAvg =
         (batting.powerplay + batting.middleOvers + batting.deathOvers) / 3;
@@ -107,10 +107,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
 
   const showBatting =
     type.toLowerCase() === "batsman" ||
-    type.toLowerCase() === "wicket-keeper" ||
-    type.toLowerCase() === "all-rounder";
+    type.toLowerCase() === "wicket keeper" ||
+    type.toLowerCase() === "all rounder";
   const showBowling =
-    type.toLowerCase() === "bowler" || type.toLowerCase() === "all-rounder";
+    type.toLowerCase() === "bowler" || type.toLowerCase() === "all rounder";
 
   return (
     <motion.div

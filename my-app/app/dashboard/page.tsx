@@ -10,16 +10,27 @@ import {
   GiPowerLightning,
 } from "react-icons/gi";
 import type React from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Dashboard() {
   const { userPlayers, loading, error, user } = useAuction();
+  if (!user) {
+    return (
+      <div>
+        <Spinner size="large">
+          <span>Loading your players</span>
+        </Spinner>
+      </div>
+    );
+  }
   const players = userPlayers;
+  console.log(players);
   const slot_num = user.slot_num;
   const batsmen = players.filter(
-    (player) => player.type === "Batsman" || player.type === "Wicket-keeper"
+    (player) => player.type === "Batsman" || player.type === "Wicket Keeper"
   );
   const bowlers = players.filter((player) => player.type === "Bowler");
-  const allRounders = players.filter((player) => player.type === "All-rounder");
+  const allRounders = players.filter((player) => player.type === "All Rounder");
 
   // Mock data for purse and powercards (replace with actual data from your context)
   const totalPurse = user.Purse;
@@ -125,24 +136,26 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      <h2 className="text-2xl font-bold mb-4 text-heliotrope">Your Players</h2>
-
-      <PlayerSection
-        title="Batsmen"
-        players={batsmen}
-        icon={<GiCricketBat className="w-6 h-6" />}
-      />
-      <PlayerSection
-        title="Bowlers"
-        players={bowlers}
-        icon={<GiBowlingPin className="w-6 h-6" />}
-      />
-      <PlayerSection
-        title="All-rounders"
-        players={allRounders}
-        icon={<GiAlliedStar className="w-6 h-6" />}
-      />
-
+      <h2 className="text-2xl font-bold mb-4 m-5 text-heliotrope">
+        Your Players
+      </h2>
+      <div className="flex flex-col m-10">
+        <PlayerSection
+          title="Batsmen"
+          players={batsmen}
+          icon={<GiCricketBat className="w-6 h-6" />}
+        />
+        <PlayerSection
+          title="Bowlers"
+          players={bowlers}
+          icon={<GiBowlingPin className="w-6 h-6" />}
+        />
+        <PlayerSection
+          title="All-rounders"
+          players={allRounders}
+          icon={<GiAlliedStar className="w-6 h-6" />}
+        />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

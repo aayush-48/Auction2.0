@@ -11,6 +11,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,11 +66,11 @@ const getTypeColor = (type) => {
 };
 
 export default function Calculator() {
-  const { players } = useAuction();
+  const { userPlayers } = useAuction();
   const [availablePlayers, setAvailablePlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [teamScore, setTeamScore] = useState(0);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0); // Start at step 0 (which is now batting powerplay)
   const [battingSelection, setBattingSelection] = useState({
     powerplay: Array(4).fill(null),
     middleOvers: Array(4).fill(null),
@@ -86,10 +87,10 @@ export default function Calculator() {
     battingBonus: 0,
     bowlingBonus: 0,
   });
+  const players = userPlayers;
 
-  // Define the steps for the sequential flow
+  // Define the steps for the sequential flow - remove the first selection step
   const steps = [
-    { name: "Selection", description: "Select your team of 11 players" },
     {
       name: "Batting Powerplay",
       description: "Assign 4 batsmen for powerplay overs",
@@ -137,118 +138,15 @@ export default function Calculator() {
 
   useEffect(() => {
     if (players && players.length > 0) {
+      // Set all players as selected players automatically
+      setSelectedPlayers(players);
       setAvailablePlayers(players);
     }
   }, [players]);
+
   useEffect(() => {
     recalculateTeamScore();
   }, [battingSelection, bowlingSelection]);
-
-  const handleSelectPlayer = (player) => {
-    if (selectedPlayers.length >= 11) {
-      alert(
-        "You've already selected 11 players. Remove a player to add a new one."
-      );
-      return;
-    }
-
-    setSelectedPlayers((prev) => [...prev, player]);
-    setAvailablePlayers((prev) => prev.filter((p) => p._id !== player._id));
-  };
-
-  const handleRemovePlayer = (player) => {
-    // Remove player from the selected list
-    setSelectedPlayers((prev) => prev.filter((p) => p._id !== player._id));
-
-    // Add the player back to available players
-    setAvailablePlayers((prev) => [...prev, player]);
-
-    // Also remove from any batting/bowling selections
-    const newBattingSelection = { ...battingSelection };
-    const newBowlingSelection = { ...bowlingSelection };
-
-    ["powerplay", "middleOvers", "deathOvers"].forEach((phase) => {
-      newBattingSelection[phase] = newBattingSelection[phase].map((p) =>
-        p && p._id === player._id ? null : p
-      );
-      newBowlingSelection[phase] = newBowlingSelection[phase].map((p) =>
-        p && p._id === player._id ? null : p
-      );
-    });
-
-    setBattingSelection(newBattingSelection);
-    setBowlingSelection(newBowlingSelection);
-  };
-
-  const recalculateTeamScore = () => {
-    let newBaseScore = 0;
-
-    // Batting section scores
-    ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
-      battingSelection[category].forEach((player) => {
-        if (!player) return;
-        newBaseScore += player.ratings.batting[category];
-      });
-    });
-
-    // Bowling section scores
-    ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
-      bowlingSelection[category].forEach((player) => {
-        if (!player) return;
-        newBaseScore += player.ratings.bowling[category];
-      });
-    });
-
-    // Bonus Calculation
-    const calculateBonus = (players, category) => {
-      const validPlayers = players.filter((p) => p !== null);
-      if (validPlayers.length === 0) return 0;
-
-      const maxPoints = validPlayers.length * 10;
-      const actualPoints = validPlayers.reduce(
-        (sum, player) =>
-          sum +
-          player.ratings[category === "batting" ? "batting" : "bowling"][
-            players === battingSelection.powerplay ||
-            players === bowlingSelection.powerplay
-              ? "powerplay"
-              : players === battingSelection.middleOvers ||
-                players === bowlingSelection.middleOvers
-              ? "middleOvers"
-              : "deathOvers"
-          ],
-        0
-      );
-
-      const percentage = (actualPoints / maxPoints) * 100;
-
-      if (percentage > 90) return 5;
-      if (percentage > 80) return 3;
-      if (percentage >= 70) return 1;
-      return 0;
-    };
-
-    // Calculate Batting Bonuses
-    const battingBonus =
-      calculateBonus(battingSelection.powerplay, "batting") +
-      calculateBonus(battingSelection.middleOvers, "batting") +
-      calculateBonus(battingSelection.deathOvers, "batting");
-
-    // Calculate Bowling Bonuses
-    const bowlingBonus =
-      calculateBonus(bowlingSelection.powerplay, "bowling") +
-      calculateBonus(bowlingSelection.middleOvers, "bowling") +
-      calculateBonus(bowlingSelection.deathOvers, "bowling");
-
-    // Update the state
-    setScoreBreakdown({
-      baseScore: Math.round(newBaseScore * 100) / 100,
-      battingBonus,
-      bowlingBonus,
-    });
-
-    setTeamScore(newBaseScore + battingBonus + bowlingBonus);
-  };
 
   const handleAssignPlayer = (player, stepIndex) => {
     const currentStepData = steps[stepIndex];
@@ -347,8 +245,6 @@ export default function Calculator() {
     if (!player) return false;
 
     const currentStepData = steps[stepIndex];
-    if (!currentStepData.category) return true; // Selection step
-
     const { category, phase } = currentStepData;
 
     // Type validation
@@ -396,6 +292,76 @@ export default function Calculator() {
     return true;
   };
 
+  const recalculateTeamScore = () => {
+    let newBaseScore = 0;
+
+    // Batting section scores
+    ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
+      battingSelection[category].forEach((player) => {
+        if (!player) return;
+        newBaseScore += player.ratings.batting[category];
+      });
+    });
+
+    // Bowling section scores
+    ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
+      bowlingSelection[category].forEach((player) => {
+        if (!player) return;
+        newBaseScore += player.ratings.bowling[category];
+      });
+    });
+
+    // Bonus Calculation
+    const calculateBonus = (players, category) => {
+      const validPlayers = players.filter((p) => p !== null);
+      if (validPlayers.length === 0) return 0;
+
+      const maxPoints = validPlayers.length * 10;
+      const actualPoints = validPlayers.reduce(
+        (sum, player) =>
+          sum +
+          player.ratings[category === "batting" ? "batting" : "bowling"][
+            players === battingSelection.powerplay ||
+            players === bowlingSelection.powerplay
+              ? "powerplay"
+              : players === battingSelection.middleOvers ||
+                players === bowlingSelection.middleOvers
+              ? "middleOvers"
+              : "deathOvers"
+          ],
+        0
+      );
+
+      const percentage = (actualPoints / maxPoints) * 100;
+
+      if (percentage > 90) return 5;
+      if (percentage > 80) return 3;
+      if (percentage >= 70) return 1;
+      return 0;
+    };
+
+    // Calculate Batting Bonuses
+    const battingBonus =
+      calculateBonus(battingSelection.powerplay, "batting") +
+      calculateBonus(battingSelection.middleOvers, "batting") +
+      calculateBonus(battingSelection.deathOvers, "batting");
+
+    // Calculate Bowling Bonuses
+    const bowlingBonus =
+      calculateBonus(bowlingSelection.powerplay, "bowling") +
+      calculateBonus(bowlingSelection.middleOvers, "bowling") +
+      calculateBonus(bowlingSelection.deathOvers, "bowling");
+
+    // Update the state
+    setScoreBreakdown({
+      baseScore: Math.round(newBaseScore * 100) / 100,
+      battingBonus,
+      bowlingBonus,
+    });
+
+    setTeamScore(newBaseScore + battingBonus + bowlingBonus);
+  };
+
   const calculateTeamScore = () => {
     // Get all selected players from batting and bowling categories
     const battingPlayers = Object.values(battingSelection)
@@ -418,19 +384,6 @@ export default function Calculator() {
     ) {
       alert(
         "Please fill all batting and bowling positions before calculating the score."
-      );
-      return;
-    }
-
-    // Verify we have 11 unique players
-    const uniquePlayerIds = new Set();
-    [...battingPlayers, ...bowlingPlayers].forEach((player) => {
-      uniquePlayerIds.add(player._id);
-    });
-
-    if (uniquePlayerIds.size !== 11) {
-      alert(
-        "You need exactly 11 unique players assigned across all positions."
       );
       return;
     }
@@ -505,15 +458,14 @@ export default function Calculator() {
     // Final Team Score
     setTeamScore(baseScore + battingBonus + bowlingBonus);
     setShowScoreDetails(true);
-    setCurrentStep(7); // Move to results step
+    setCurrentStep(6); // Move to results step
   };
 
   const isStepComplete = (stepIndex) => {
     const step = steps[stepIndex];
 
-    if (stepIndex === 0) {
-      return selectedPlayers.length === 11;
-    } else if (stepIndex === 7) {
+    if (stepIndex === 6) {
+      // Results step (was 7, now 6)
       return showScoreDetails;
     } else {
       const { category, phase } = step;
@@ -553,7 +505,7 @@ export default function Calculator() {
 
         <div className="absolute top-0 left-0 right-0">
           <Badge
-            className={`${getTypeColor(player.type)} text-white text-xs m-2`}
+            className={`${getTypeColor(player.type)} text-black text-xs m-2`}
           >
             {player.type}
           </Badge>
@@ -572,7 +524,7 @@ export default function Calculator() {
             <h3 className="font-semibold truncate">{player.name}</h3>
             <p className="text-xs text-gray-500">{player.country}</p>
             <div className="flex justify-center mt-2">
-              <Badge variant="outline" className="bg-amber-100">
+              <Badge variant="outline" className="bg-amber-100 text-black">
                 Rating: {calculateOverallRating(player)}
               </Badge>
             </div>
@@ -650,59 +602,8 @@ export default function Calculator() {
   const renderStepContent = () => {
     const step = steps[currentStep];
 
-    // Step 0: Team Selection
-    if (currentStep === 0) {
-      return (
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-medium mb-2">Available Players</h3>
-            <ScrollArea className="h-96 border rounded-lg p-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {availablePlayers.map((player) => (
-                  <div
-                    key={player._id}
-                    onClick={() => handleSelectPlayer(player)}
-                    className="cursor-pointer"
-                  >
-                    {renderPlayerCard(player)}
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-medium">Selected Players</h3>
-              <Badge variant="outline">
-                {selectedPlayers.length}/11 players
-              </Badge>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {selectedPlayers.map((player) => renderPlayerCard(player, true))}
-
-              {Array.from({
-                length: Math.max(0, 11 - selectedPlayers.length),
-              }).map((_, idx) => (
-                <Card
-                  key={`empty-${idx}`}
-                  className="border-dashed border-2 border-gray-300 min-h-[180px] flex items-center justify-center"
-                >
-                  <div className="text-gray-400 flex flex-col items-center">
-                    <UserIcon size={32} />
-                    <p className="text-sm mt-2">Empty Slot</p>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Step 7: Results
-    if (currentStep === 7) {
+    // Step 6 (was 7): Results
+    if (currentStep === 6) {
       return (
         <div className="space-y-6">
           <div className="flex flex-col items-center py-6">
@@ -784,7 +685,7 @@ export default function Calculator() {
       );
     }
 
-    // Steps 1-6: Assignment Steps
+    // Steps 0-5: Assignment Steps (was 1-6)
     const { category, phase, count } = step;
 
     return (
@@ -799,41 +700,40 @@ export default function Calculator() {
               : "Select players who will bowl during this phase"}
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {selectedPlayers
-              .filter((player) => {
-                // Get the current step's category (batting or bowling)
-                const step = steps[currentStep];
-                if (!step.category) return true; // No filtering for selection step
+          <ScrollArea className="h-96 border rounded-lg p-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {selectedPlayers
+                .filter((player) => {
+                  // Filter based on the current step's category
+                  if (step.category === "batting") {
+                    // Only show batsmen, wicket keepers, and all-rounders in batting
+                    return (
+                      player.type.toLowerCase() === "batsman" ||
+                      player.type.toLowerCase() === "wicket keeper" ||
+                      player.type.toLowerCase() === "all rounder"
+                    );
+                  }
 
-                if (step.category === "batting") {
-                  // Only allow batsmen, wicket keepers, and all-rounders in batting
-                  return (
-                    player.type.toLowerCase() === "batsman" ||
-                    player.type.toLowerCase() === "wicket keeper" ||
-                    player.type.toLowerCase() === "all rounder"
-                  );
-                }
+                  if (step.category === "bowling") {
+                    // Only show bowlers and all-rounders in bowling
+                    return (
+                      player.type.toLowerCase() === "bowler" ||
+                      player.type.toLowerCase() === "all rounder"
+                    );
+                  }
 
-                if (step.category === "bowling") {
-                  // Only allow bowlers and all-rounders in bowling
-                  return (
-                    player.type.toLowerCase() === "bowler" ||
-                    player.type.toLowerCase() === "all rounder"
-                  );
-                }
-
-                return true;
-              })
-              .map((player) =>
-                renderPlayerCard(
-                  player,
-                  false,
-                  true,
-                  !isPlayerEligibleForAssignment(player, currentStep)
-                )
-              )}
-          </div>
+                  return true;
+                })
+                .map((player) =>
+                  renderPlayerCard(
+                    player,
+                    false,
+                    true,
+                    !isPlayerEligibleForAssignment(player, currentStep)
+                  )
+                )}
+            </div>
+          </ScrollArea>
         </div>
 
         <div>
@@ -907,7 +807,7 @@ export default function Calculator() {
             Previous
           </Button>
 
-          {currentStep < 6 ? (
+          {currentStep < 5 ? (
             <>
               <div className="flex gap-5">
                 <p className="text-gray-500 mt-2">Total Team Score</p>
@@ -924,7 +824,7 @@ export default function Calculator() {
                 <ArrowRightIcon size={16} className="ml-2" />
               </Button>
             </>
-          ) : currentStep === 6 ? (
+          ) : currentStep === 5 ? (
             <Button
               onClick={calculateTeamScore}
               disabled={!canProceedToNextStep()}
@@ -939,7 +839,6 @@ export default function Calculator() {
               variant="outline"
               onClick={() => {
                 // Reset everything
-                setSelectedPlayers([]);
                 setBattingSelection({
                   powerplay: Array(4).fill(null),
                   middleOvers: Array(4).fill(null),
@@ -953,10 +852,9 @@ export default function Calculator() {
                 setTeamScore(0);
                 setShowScoreDetails(false);
                 setCurrentStep(0);
-                setAvailablePlayers(players);
               }}
             >
-              Submit
+              Start Over
             </Button>
           )}
         </div>
