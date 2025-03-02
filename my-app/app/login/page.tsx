@@ -23,6 +23,7 @@ export default function Login() {
 
       // Save token to localStorage
       localStorage.setItem("token", data.token);
+      localStorage.setItem("id", data.id);
       localStorage.setItem("role", data.role); // Store role for redirection
 
       // Redirect based on role

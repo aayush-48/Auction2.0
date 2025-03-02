@@ -1,93 +1,140 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
-import { getPlayers, getTeams } from "../app/api/api"
+import type React from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import {
+  getPlayers,
+  getTeams,
+  getUserById,
+  getPlayersByUser,
+} from "../app/api/api";
 
 export interface Player {
-  id: string
-  name: string
-  country: string
-  gender: string
-  type: string
-  team: string
-  basePrice: number
-  finalPrice: number
-  photo: string
-  overallRating: number
+  id: string;
+  name: string;
+  country: string;
+  gender: string;
+  type: string;
+  team: string;
+  basePrice: number;
+  finalPrice: { slot_num: number; price: number }[];
+  photo: string;
+  overallRating: number;
   ratings: {
     batting: {
-      powerplay: number
-      middleOvers: number
-      deathOvers: number
-    }
+      powerplay: number;
+      middleOvers: number;
+      deathOvers: number;
+    };
     bowling: {
-      powerplay: number
-      middleOvers: number
-      deathOvers: number
-    }
-    rtmElite: number
-    captaincy: number
-  }
-  rtmTeam?: string
-  isLegendary?: boolean
-  isWomen?: boolean
-  isUnderdog?: boolean
+      powerplay: number;
+      middleOvers: number;
+      deathOvers: number;
+    };
+    rtmElite: number;
+    captaincy: number;
+  };
+  rtmTeam?: string;
+  isElite?: boolean;
 }
 
 export interface Team {
-  id: string
-  name: string
-  score: number
+  id: string;
+  name: string;
+  src: string;
+}
+export interface User {
+  _id: string;
+  password: string;
+  player_ids: string[];
+  slot_num: number;
+  power_card_id: string[];
+  Purse: number;
+  Score: number;
+  role: string;
+  username: string;
+  ipl_team_id: string;
 }
 
 interface AuctionContextType {
-  players: Player[]
-  teams: Team[]
-  setPlayers: React.Dispatch<React.SetStateAction<Player[]>>
-  setTeams: React.Dispatch<React.SetStateAction<Team[]>>
-  loading: boolean
-  error: string | null
+  user: User;
+  userPlayers: Player[];
+  players: Player[];
+  teams: Team[];
+  setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
+  setTeams: React.Dispatch<React.SetStateAction<Team[]>>;
+  loading: boolean;
+  error: string | null;
 }
 
-const AuctionContext = createContext<AuctionContextType | undefined>(undefined)
+const AuctionContext = createContext<AuctionContextType | undefined>(undefined);
 
 export const useAuction = () => {
-  const context = useContext(AuctionContext)
+  const context = useContext(AuctionContext);
   if (!context) {
-    throw new Error("useAuction must be used within an AuctionProvider")
+    throw new Error("useAuction must be used within an AuctionProvider");
   }
-  return context
-}
+  return context;
+};
 
-export const AuctionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [players, setPlayers] = useState<Player[]>([])
-  const [teams, setTeams] = useState<Team[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-
+export const AuctionProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | undefined>();
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userPlayers, setUserPlayers] = useState<Player[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
-        const [playersResponse, teamsResponse] = await Promise.all([getPlayers(), getTeams()])
-        setPlayers(playersResponse.data)
-        setTeams(teamsResponse.data)
+        setLoading(true);
+        const id = localStorage.getItem("id");
+        if (!id) {
+          throw new Error("User ID not found in localStorage");
+        }
+        const [
+          playersResponse,
+          teamsResponse,
+          userResponse,
+          userPlayersResponse,
+        ] = await Promise.all([
+          getPlayers(),
+          getTeams(),
+          getUserById(id),
+          getPlayersByUser(id),
+        ]);
+        setPlayers(playersResponse.data);
+        setTeams(teamsResponse.data);
+        setUser(userResponse.data);
+        setUserPlayers(userPlayersResponse.data);
       } catch (error) {
-        console.error("Error fetching data:", error)
-        setError("Failed to fetch data. Please try again later.")
+        console.error("Error fetching data:", error);
+        setError("Failed to fetch data. Please try again later.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   return (
-    <AuctionContext.Provider value={{ players, teams, setPlayers, setTeams, loading, error }}>
+    <AuctionContext.Provider
+      value={{
+        user,
+        userPlayers,
+        setUser,
+        players,
+        teams,
+        setPlayers,
+        setTeams,
+        loading,
+        error,
+      }}
+    >
       {children}
     </AuctionContext.Provider>
-  )
-}
-
+  );
+};

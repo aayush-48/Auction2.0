@@ -2,7 +2,7 @@ import express from "express";
 import {
   getPlayers,
   getPlayerById,
-  getPlayersByTeam,
+  getPlayersByUser,
   createPlayer,
   updatePlayer,
   deletePlayer,
@@ -18,6 +18,6 @@ router
   .get(getPlayerById)
   .put(protect, admin, updatePlayer)
   .delete(protect, admin, deletePlayer);
-router.route("/team/:team").get(getPlayersByTeam);
+router.route("/user/:id").get(getPlayersByUser);
 router.route("/assign/:id").post(assignPlayer);
 export default router;

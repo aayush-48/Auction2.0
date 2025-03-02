@@ -1,33 +1,47 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { useAuction } from "../../context/AuctionContext"
-import PlayerCard from "../../components/PlayerCard"
-import { GiCricketBat, GiBowlingPin, GiAlliedStar, GiPowerLightning } from "react-icons/gi"
-import type React from "react"
+import { motion } from "framer-motion";
+import { useAuction } from "../../context/AuctionContext";
+import PlayerCard from "../../components/PlayerCard";
+import {
+  GiCricketBat,
+  GiBowlingPin,
+  GiAlliedStar,
+  GiPowerLightning,
+} from "react-icons/gi";
+import type React from "react";
 
 export default function Dashboard() {
-  const { players, loading, error } = useAuction()
-
-  const batsmen = players.filter((player) => player.type === "Batsman" || player.type === "Wicket-keeper")
-  const bowlers = players.filter((player) => player.type === "Bowler")
-  const allRounders = players.filter((player) => player.type === "All-rounder")
+  const { userPlayers, loading, error, user } = useAuction();
+  const players = userPlayers;
+  const slot_num = user.slot_num;
+  const batsmen = players.filter(
+    (player) => player.type === "Batsman" || player.type === "Wicket-keeper"
+  );
+  const bowlers = players.filter((player) => player.type === "Bowler");
+  const allRounders = players.filter((player) => player.type === "All-rounder");
 
   // Mock data for purse and powercards (replace with actual data from your context)
-  const totalPurse = 1000000000 // 100 Crore
-  const teamValue = players.reduce((sum, player) => sum + player.finalPrice, 0)
-  const remainingPurse = Math.max(0, totalPurse - teamValue) // Ensure remaining purse is not negative
-  const totalPowercards = 5
-  const usedPowercards = 2
+  const totalPurse = user.Purse;
+  const teamValue = players.reduce((sum, player) => {
+    console.log(user);
+    const slotPrice =
+      player.finalPrice.find((slot) => Number(slot.slot_num) === slot_num)
+        ?.price || 0;
+    return sum + Number(slotPrice);
+  }, 0);
+  const remainingPurse = Math.max(0, totalPurse - teamValue); // Ensure remaining purse is not negative
+  const totalPowercards = 5;
+  const usedPowercards = 2;
 
   const PlayerSection = ({
     title,
     players,
     icon,
   }: {
-    title: string
-    players: typeof batsmen
-    icon: React.ReactNode
+    title: string;
+    players: typeof batsmen;
+    icon: React.ReactNode;
   }) => (
     <div className="mb-8">
       <h3 className="text-xl font-bold mb-4 text-heliotrope flex items-center">
@@ -39,24 +53,39 @@ export default function Dashboard() {
           <PlayerCard
             key={player.id}
             {...player}
-            rtmTeam={player.rtmTeam as "CSK" | "DC" | "GT" | "KKR" | "LSG" | "MI" | "PBKS" | "RCB" | "RR" | "SRH"}
+            slot_num={slot_num}
+            rtmTeam={
+              player.rtmTeam as
+                | "CSK"
+                | "DC"
+                | "GT"
+                | "KKR"
+                | "LSG"
+                | "MI"
+                | "PBKS"
+                | "RCB"
+                | "RR"
+                | "SRH"
+            }
             isElite={player.ratings.rtmElite > 8}
           />
         ))}
       </div>
     </div>
-  )
+  );
 
   const formatPrice = (price: number) => {
-    return price >= 10000000 ? `${(price / 10000000).toFixed(2)} Cr` : `${(price / 100000).toFixed(2)} Lakh`
-  }
+    return price >= 10000000
+      ? `${(price / 10000000).toFixed(2)} Cr`
+      : `${(price / 100000).toFixed(2)} Lakh`;
+  };
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>
+    return <div>Error: {error}</div>;
   }
 
   return (
@@ -67,7 +96,9 @@ export default function Dashboard() {
         transition={{ duration: 0.5 }}
         className="bg-gradient-to-r from-russian-violet-2 to-tekhelet bg-opacity-30 backdrop-filter backdrop-blur-lg rounded-lg p-6 shadow-lg"
       >
-        <h2 className="text-2xl font-bold mb-4 text-heliotrope">Team Overview</h2>
+        <h2 className="text-2xl font-bold mb-4 text-heliotrope">
+          Team Overview
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <p className="text-sm text-gray-400">Total Players</p>
@@ -75,24 +106,42 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-sm text-gray-400">Team Value</p>
-            <p className="text-3xl font-bold text-white">{formatPrice(teamValue)}</p>
+            <p className="text-3xl font-bold text-white">
+              {formatPrice(teamValue)}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-400">Total Purse</p>
-            <p className="text-3xl font-bold text-white">{formatPrice(totalPurse)}</p>
+            <p className="text-3xl font-bold text-white">
+              {formatPrice(totalPurse)}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-400">Remaining Purse</p>
-            <p className="text-3xl font-bold text-white">{formatPrice(remainingPurse)}</p>
+            <p className="text-3xl font-bold text-white">
+              {formatPrice(remainingPurse)}
+            </p>
           </div>
         </div>
       </motion.div>
 
       <h2 className="text-2xl font-bold mb-4 text-heliotrope">Your Players</h2>
 
-      <PlayerSection title="Batsmen" players={batsmen} icon={<GiCricketBat className="w-6 h-6" />} />
-      <PlayerSection title="Bowlers" players={bowlers} icon={<GiBowlingPin className="w-6 h-6" />} />
-      <PlayerSection title="All-rounders" players={allRounders} icon={<GiAlliedStar className="w-6 h-6" />} />
+      <PlayerSection
+        title="Batsmen"
+        players={batsmen}
+        icon={<GiCricketBat className="w-6 h-6" />}
+      />
+      <PlayerSection
+        title="Bowlers"
+        players={bowlers}
+        icon={<GiBowlingPin className="w-6 h-6" />}
+      />
+      <PlayerSection
+        title="All-rounders"
+        players={allRounders}
+        icon={<GiAlliedStar className="w-6 h-6" />}
+      />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -107,7 +156,9 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-gray-400">Available Powercards</p>
-            <p className="text-3xl font-bold text-white">{totalPowercards - usedPowercards}</p>
+            <p className="text-3xl font-bold text-white">
+              {totalPowercards - usedPowercards}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-400">Used Powercards</p>
@@ -116,6 +167,5 @@ export default function Dashboard() {
         </div>
       </motion.div>
     </div>
-  )
+  );
 }
-

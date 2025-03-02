@@ -1,5 +1,7 @@
+import { isValidObjectId } from "mongoose";
 import Player from "../models/Player.js";
 import User from "../models/User.js";
+import mongoose from "mongoose";
 export const getPlayers = async (req, res) => {
   try {
     const players = await Player.find();
@@ -10,10 +12,19 @@ export const getPlayers = async (req, res) => {
   }
 };
 
-export const getPlayersByTeam = async (req, res) => {
+export const getPlayersByUser = async (req, res) => {
   try {
-    const { team } = req.params;
-    const players = await Player.find({ team });
+    const { id } = req.params;
+    const user = await User.findOne({ _id: new mongoose.Types.ObjectId(id) });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const player_ids = user.player_ids;
+
+    const players = await Player.find({ _id: { $in: player_ids } });
+
     res.json(players);
   } catch (error) {
     console.log("Error", error);

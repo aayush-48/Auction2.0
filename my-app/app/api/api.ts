@@ -18,11 +18,10 @@ api.interceptors.request.use((config) => {
 });
 
 export const login = (username: string, password: string) =>
-  api.post("/users/login", { username, password, slot_number: 0 });
+  api.post("/users/login", { username, password });
 
 export const getPlayers = () => api.get("/players");
-export const getPlayersByTeam = (team: string) =>
-  api.get(`/players/team/${team}`);
+export const getPlayersByUser = (id: string) => api.get(`/players/user/${id}`);
 export const getPlayerById = (id: string) => api.get(`/players/${id}`);
 export const createPlayer = (playerData: any) =>
   api.post("/players", playerData);
@@ -49,6 +48,7 @@ export const updatePowerCard = (id: string, powerCardData: any) =>
 export const deletePowerCard = (id: string) => api.delete(`/powerCards/${id}`);
 
 export const getUsers = () => api.get("/users");
+export const getUserById = (id: string) => api.get(`/users/${id}`);
 export const updateUserPurse = (id: string, userData: any) =>
   api.post(`/users/updateWallet/${id}`, userData);
 export const getAnalytics = () => api.get("/analytics");
