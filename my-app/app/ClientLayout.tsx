@@ -18,7 +18,6 @@ export default function ClientLayout({
     <AuctionProvider>
       {!isLoginPage && <Navbar />}
       <main>{children}</main>
-      {!isLoginPage && <Footer />}
     </AuctionProvider>
   )
 }

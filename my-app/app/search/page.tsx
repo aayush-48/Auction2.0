@@ -22,7 +22,7 @@ export default function Search() {
     const matchesRole = !filters.role || player.type === filters.role
     const matchesTeam = !filters.team || player.team === filters.team
 
-    return matchesSearch && matchesRole && matchesTeam
+    return matchesSearch && matchesRole /*&& matchesTeam*/
   })
 
   return (
@@ -34,7 +34,7 @@ export default function Search() {
         className="bg-gradient-to-r from-russian-violet-2 to-tekhelet bg-opacity-30 backdrop-filter backdrop-blur-lg rounded-lg p-6 shadow-lg"
       >
         <h2 className="text-2xl font-bold mb-4 text-heliotrope">Search Players</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             type="text"
             placeholder="Search players..."
@@ -53,12 +53,12 @@ export default function Search() {
             <option value="All-rounder">All-rounder</option>
             <option value="Wicket-keeper">Wicket-keeper</option>
           </select>
-          <select
+          {/* <select
             value={filters.team}
             onChange={(e) => setFilters({ ...filters, team: e.target.value })}
             className="bg-russian-violet bg-opacity-50 text-white rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amethyst"
           >
-            <option value="">All Teams</option>
+           <option value="">All Teams</option>
             <option value="MI">Mumbai Indians</option>
             <option value="CSK">Chennai Super Kings</option>
             <option value="RCB">Royal Challengers Bangalore</option>
@@ -69,7 +69,7 @@ export default function Search() {
             <option value="SRH">Sunrisers Hyderabad</option>
             <option value="GT">Gujarat Titans</option>
             <option value="LSG">Lucknow Super Giants</option>
-          </select>
+          </select> */}
         </div>
       </motion.div>
 
