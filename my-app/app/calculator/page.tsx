@@ -816,7 +816,8 @@ export default function Calculator() {
                 </div>
               </div>
               <Button
-                onClick={() => setCurrentStep((prev) => prev + 1)}
+                onClick={() => { console.log(currentStep);
+                 setCurrentStep((prev) => prev + 1)}}
                 disabled={!canProceedToNextStep()}
                 className="bg-indigo-600 hover:bg-indigo-700 flex items-center"
               >

@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_API_URL: "http://localhost:5000/api",
+    NEXT_PUBLIC_API_URL: "http://localhost:5001/api",
   },
   images: {
     remotePatterns: [
@@ -62,6 +62,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "cricclubs.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.bdcrictime.com",
+      },
+      {
+        protocol : "https",
+        hostname : "assets-webp.khelnow.com"
+      }
     ],
   },
 };

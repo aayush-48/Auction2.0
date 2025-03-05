@@ -12,7 +12,7 @@ interface PlayerCardProps {
   country: string;
   gender: string;
   type: string;
-  basePrice: string;
+  basePrice: string | number;
   finalPrice: { slot_num: number; price: number }[];
   ratings: {
     batting: {
