@@ -37,9 +37,16 @@ export default function Login() {
     }
     setLoading(false);
   };
+  const backgroundStyle = {
+    backgroundImage: "url('https://images.app.goo.gl/EWPsz77ubNEmo2qo8')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    height: "100vh",
+    width: "100vw",
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-russian-violet to-tekhelet">
+    <div style={backgroundStyle} className="min-h-screen flex items-center justify-center bg-gradient-to-r from-russian-violet to-tekhelet">
       <div className="bg-french-violet bg-opacity-30 p-8 rounded-lg shadow-lg w-96">
         <h1 className="text-3xl font-bold mb-6 text-center text-heliotrope">
           Login
