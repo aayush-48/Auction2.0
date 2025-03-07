@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import AssignPlayer from "@/components/AssignPlayer";
+import UnassignPlayer from "@/components/UnassignPlayer";
 import UpdatePurse from "@/components/UpdatePurse";
 import AssignTeam from "@/components/AssignTeam";
 export default function AdminPanel() {
@@ -56,7 +57,12 @@ export default function AdminPanel() {
         </button>
       </div>
 
-      {activeTab === "players" && <AssignPlayer />}
+      {activeTab === "players" && (
+        <div className="flex flex-col gap-10">
+          <AssignPlayer />
+          <UnassignPlayer />
+        </div>
+      )}
       {activeTab === "users" && <UpdatePurse />}
       {activeTab === "teams" && <AssignTeam />}
     </div>

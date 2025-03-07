@@ -11,7 +11,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-
+import { getPlayersByUser } from "../api/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,11 @@ import {
   BarChart3Icon,
   CheckCircleIcon,
 } from "lucide-react";
+
+const fetchUserPlayers = async (id: string) => {
+  const response = await getPlayersByUser(id);
+  return response.data;
+};
 
 const calculateOverallRating = (player) => {
   const { ratings, type } = player;
@@ -66,7 +71,7 @@ const getTypeColor = (type) => {
 };
 
 export default function Calculator() {
-  const { userPlayers } = useAuction();
+  const { user } = useAuction();
   const [availablePlayers, setAvailablePlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [teamScore, setTeamScore] = useState(0);
@@ -87,7 +92,17 @@ export default function Calculator() {
     battingBonus: 0,
     bowlingBonus: 0,
   });
-  const players = userPlayers;
+  const [players, setPlayers] = useState([]);
+  const [flag, setFlag] = useState(false);
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      if (user) {
+        const fetchedPlayers = await fetchUserPlayers(user._id);
+        setPlayers(fetchedPlayers);
+      }
+    };
+    fetchPlayers();
+  }, [user, flag]);
 
   // Define the steps for the sequential flow - remove the first selection step
   const steps = [
@@ -761,6 +776,13 @@ export default function Calculator() {
           <p className="text-purple-100 text-sm">
             Build and optimize your dream cricket team
           </p>
+          <Button
+            className="m-5"
+            variant={"outline"}
+            onClick={() => setFlag((prevFlag) => !prevFlag)}
+          >
+            Refresh
+          </Button>
         </div>
 
         <div className="p-4 bg-gray-50 border-b">
@@ -816,8 +838,10 @@ export default function Calculator() {
                 </div>
               </div>
               <Button
-                onClick={() => { console.log(currentStep);
-                 setCurrentStep((prev) => prev + 1)}}
+                onClick={() => {
+                  console.log(currentStep);
+                  setCurrentStep((prev) => prev + 1);
+                }}
                 disabled={!canProceedToNextStep()}
                 className="bg-indigo-600 hover:bg-indigo-700 flex items-center"
               >
@@ -835,6 +859,7 @@ export default function Calculator() {
               <BarChart3Icon size={16} className="ml-2" />
             </Button>
           ) : (
+            //put submit
             <Button
               className="bg-indigo-600 hover:bg-indigo-700"
               variant="outline"

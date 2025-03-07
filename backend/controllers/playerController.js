@@ -132,3 +132,53 @@ export const assignPlayer = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const unassignPlayer = async (req, res) => {
+  try {
+    const { selectedTeam, selectedSlot } = req.body;
+    const playerId = req.params.id;
+
+    // Find the user assigned to the player
+    const selectedUser = await User.findOne({
+      role: "player",
+      ipl_team_id: selectedTeam,
+      slot_num: selectedSlot,
+    });
+    if (!selectedUser) {
+      return res.status(400).json({ message: "Could not find assigned user." });
+    }
+
+    // Ensure player_ids exists and is an array
+    if (!Array.isArray(selectedUser.player_ids)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid player assignment data." });
+    }
+
+    // Check if the player is assigned to this user
+    if (!selectedUser.player_ids.includes(playerId)) {
+      return res
+        .status(400)
+        .json({ message: "Player is not assigned to this user." });
+    }
+    // Remove the player ID
+    selectedUser.player_ids = selectedUser.player_ids.filter(
+      (id) => id.toString() !== playerId
+    );
+
+    await selectedUser.save();
+
+    // Update player's finalPrice history
+    const player = await Player.findOne({ _id: playerId });
+    if (player) {
+      player.finalPrice = player.finalPrice.filter(
+        (entry) => entry.slot_num !== selectedSlot
+      );
+      await player.save();
+    }
+    return res.status(200).json({ message: "Player unassigned successfully" });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

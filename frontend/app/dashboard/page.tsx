@@ -11,9 +11,27 @@ import {
 } from "react-icons/gi";
 import type React from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { getPlayersByUser } from "../api/api";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+const fetchUserPlayers = async (id: string) => {
+  const response = await getPlayersByUser(id);
+  return response.data;
+};
 
 export default function Dashboard() {
-  const { userPlayers, loading, error, user } = useAuction();
+  const { loading, error, user } = useAuction();
+  const [players, setPlayers] = useState([]);
+  const [flag, setFlag] = useState(false);
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      if (user) {
+        const fetchedPlayers = await fetchUserPlayers(user._id);
+        setPlayers(fetchedPlayers);
+      }
+    };
+    fetchPlayers();
+  }, [user, flag]);
   if (!user) {
     return (
       <div>
@@ -23,8 +41,7 @@ export default function Dashboard() {
       </div>
     );
   }
-  const players = userPlayers;
-  console.log(players);
+
   const slot_num = user.slot_num;
   const batsmen = players.filter(
     (player) => player.type === "Batsman" || player.type === "Wicket Keeper"
@@ -35,7 +52,6 @@ export default function Dashboard() {
   // Mock data for purse and powercards (replace with actual data from your context)
   const totalPurse = user.Purse;
   const teamValue = players.reduce((sum, player) => {
-    console.log(user);
     const slotPrice =
       player.finalPrice.find((slot) => Number(slot.slot_num) === slot_num)
         ?.price || 0;
@@ -62,7 +78,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {players.map((player) => (
           <PlayerCard
-            key={player.id}
+            key={player._id}
             {...player}
             slot_num={slot_num}
             rtmTeam={
@@ -117,28 +133,26 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-sm text-gray-400">Team Value</p>
-            <p className="text-3xl font-bold text-white">
-              {formatPrice(teamValue)}
-            </p>
+            <p className="text-3xl font-bold text-white">{teamValue} Cr</p>
           </div>
           <div>
             <p className="text-sm text-gray-400">Total Purse</p>
-            <p className="text-3xl font-bold text-white">
-              {formatPrice(totalPurse)}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400">Remaining Purse</p>
-            <p className="text-3xl font-bold text-white">
-              {formatPrice(remainingPurse)}
-            </p>
+            <p className="text-3xl font-bold text-white">{totalPurse} Cr</p>
           </div>
         </div>
       </motion.div>
-
-      <h2 className="text-2xl font-bold mb-4 m-5 text-heliotrope">
-        Your Players
-      </h2>
+      <div className="min-w-full flex justify-between">
+        <h2 className="text-2xl font-bold mb-4 m-5 text-heliotrope">
+          Your Players
+        </h2>
+        <Button
+          className="m-5"
+          variant={"outline"}
+          onClick={() => setFlag((prevFlag) => !prevFlag)}
+        >
+          Refresh
+        </Button>
+      </div>
       <div className="flex flex-col m-10">
         <PlayerSection
           title="Batsmen"
