@@ -1,5 +1,6 @@
 import Team from "../models/Team.js";
 import User from "../models/User.js";
+import Player from "../models/Player.js";
 export const getTeams = async (req, res) => {
   try {
     const teams = await Team.find();
@@ -128,3 +129,26 @@ export const getTeamsOfSlot = async(req , res) =>{
 
   res.status(200).json({msg : "Route is working" , sortedTeams })
 }
+export const getPlayersByTeam = async (req, res) => {
+  try {
+    const teamId = req.params.id;
+    const { slot } = req.query;
+    const team = await Team.findOne({ teamId: teamId });
+    if (!team) return res.status(404).json({ message: "Team not found" });
+    const user = await User.findOne({
+      ipl_team_id: team._id.toString(),
+      slot_num: slot,
+    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const player_ids = user.player_ids;
+
+    const players = await Player.find({ _id: { $in: player_ids } });
+
+    res.json(players);
+  } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

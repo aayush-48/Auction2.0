@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -17,19 +17,34 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// API functions
 export const login = (username: string, password: string) =>
   api.post("/users/login", { username, password });
 
 export const getPlayers = () => api.get("/players");
 export const getPlayersByUser = (id: string) => api.get(`/players/user/${id}`);
 export const getPlayerById = (id: string) => api.get(`/players/${id}`);
-export const createPlayer = (playerData: any) =>
-  api.post("/players", playerData);
-export const updatePlayer = (id: string, playerData: any) =>
-  api.put(`/players/${id}`, playerData);
-export const deletePlayer = (id: string) => api.delete(`/players/${id}`);
+
+export const createPlayer = async (playerData: any) => {
+  const response = await api.post("/players", playerData);
+  return response;
+};
+
+export const updatePlayer = async (id: string, playerData: any) => {
+  const response = await api.put(`/players/${id}`, playerData);
+  return response;
+};
+
+export const deletePlayer = async (id: string) => {
+  const response = await api.delete(`/players/${id}`);
+  return response;
+};
+
 export const assignPlayer = (id: string, teamData: any) =>
   api.post(`/players/assign/${id}`, teamData);
+
+export const unassignPlayer = (id: string, data: any) =>
+  api.post(`players/unassign/${id}`, data);
 
 export const getTeams = () => api.get("/teams");
 export const getTeamById = (id: string) => api.get(`/teams/${id}`);
@@ -39,6 +54,8 @@ export const updateTeam = (id: string, teamData: any) =>
 export const deleteTeam = (id: string) => api.delete(`/teams/${id}`);
 export const assignTeam = (id: string, teamData: any) =>
   api.post(`/teams/assign/${id}`, teamData);
+export const getPlayersByTeam = (id: string, slot: number) =>
+  api.get(`/teams/players/${id}`, { params: { slot: slot } });
 
 export const getPowerCards = () => api.get("/powerCards");
 export const createPowerCard = (powerCardData: any) =>

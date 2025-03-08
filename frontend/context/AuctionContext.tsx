@@ -138,7 +138,6 @@ export const AuctionProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         userPlayers,
-        setUser,
         players,
         teams,
         setPlayers,

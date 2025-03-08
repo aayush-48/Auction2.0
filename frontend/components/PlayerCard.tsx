@@ -139,14 +139,12 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div>
           <p className="text-sm text-mauve">Base Price</p>
-          <p className="text-xl font-bold text-white">
-            {formatPrice(basePrice)}
-          </p>
+          <p className="text-xl font-bold text-white">{basePrice} Cr</p>
         </div>
         <div>
           <p className="text-sm text-mauve">Final Price</p>
           <p className="text-xl font-bold text-heliotrope">
-            {formatPrice(finalPriceNum)}
+            {finalPriceNum} Cr
           </p>
         </div>
       </div>

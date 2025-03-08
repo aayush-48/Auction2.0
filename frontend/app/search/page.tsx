@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react"
 import { motion } from "framer-motion"
@@ -9,8 +9,8 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 export default function Search() {
-  const { players } = useAuction()
-  const [searchTerm, setSearchTerm] = useState("")
+  const { players } = useAuction();
+  const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     role: "",
     team: "",
@@ -24,16 +24,18 @@ export default function Search() {
         }
   } , [])
 
-  const allPlayers = playerData.flatMap((set) => set.players)
-  const playerMap = new Map(allPlayers.map((player) => [player.name, player]))
+  const allPlayers = playerData.flatMap((set) => set.players);
+  const playerMap = new Map(allPlayers.map((player) => [player.name, player]));
 
   const filteredPlayers = players.filter((player) => {
-    const matchesSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = !filters.role || player.type === filters.role
-    const matchesTeam = !filters.team || player.team === filters.team
+    const matchesSearch = player.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesRole = !filters.role || player.type === filters.role;
+    const matchesTeam = !filters.team || player.team === filters.team;
 
-    return matchesSearch && matchesRole && matchesTeam
-  })
+    return matchesSearch && matchesRole && matchesTeam;
+  });
 
   return (
     <div className="space-y-8">
@@ -43,7 +45,9 @@ export default function Search() {
         transition={{ duration: 0.5 }}
         className="bg-gradient-to-r from-russian-violet-2 to-tekhelet bg-opacity-30 backdrop-filter backdrop-blur-lg rounded-lg p-6 shadow-lg"
       >
-        <h2 className="text-2xl font-bold mb-4 text-heliotrope">Search Players</h2>
+        <h2 className="text-2xl font-bold mb-4 text-heliotrope">
+          Search Players
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
             type="text"
@@ -88,13 +92,24 @@ export default function Search() {
           <PlayerCard
             key={player.id}
             {...player}
-            rtmTeam={player.rtmTeam as "CSK" | "DC" | "GT" | "KKR" | "LSG" | "MI" | "PBKS" | "RCB" | "RR" | "SRH"}
+            rtmTeam={
+              player.rtmTeam as
+                | "CSK"
+                | "DC"
+                | "GT"
+                | "KKR"
+                | "LSG"
+                | "MI"
+                | "PBKS"
+                | "RCB"
+                | "RR"
+                | "SRH"
+            }
             isElite={player.ratings.rtmElite > 8}
-            src={playerMap.get(player.name)?.src}
+            src={player?.src}
           />
         ))}
       </div>
     </div>
-  )
+  );
 }
-
