@@ -11,7 +11,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-
+import { setUserScore } from "../api/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,8 @@ import {
   BarChart3Icon,
   CheckCircleIcon,
 } from "lucide-react";
-
+import axios from "axios";
+import { useRouter } from "next/navigation";
 const calculateOverallRating = (player) => {
   const { ratings, type } = player;
   const { batting, bowling, rtmElite, captaincy } = ratings;
@@ -66,6 +67,7 @@ const getTypeColor = (type) => {
 };
 
 export default function Calculator() {
+  const router = useRouter();
   const { userPlayers } = useAuction();
   const [availablePlayers, setAvailablePlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -746,6 +748,17 @@ export default function Calculator() {
     );
   };
 
+  const handleSubmit = async(e)=>{
+    console.log(teamScore);
+    const res = await setUserScore(localStorage.getItem("id")|| "" , teamScore);
+    console.log(res);
+    if(res.status === 200){
+      router.push("/leaderboard");
+    } else {
+      router.refresh();
+    }
+  }
+
   return (
     <div className="space-y-4 max-w-6xl mx-auto my-10">
       <motion.div
@@ -816,8 +829,10 @@ export default function Calculator() {
                 </div>
               </div>
               <Button
-                onClick={() => { console.log(currentStep);
-                 setCurrentStep((prev) => prev + 1)}}
+                onClick={() => {
+                  console.log(currentStep);
+                  setCurrentStep((prev) => prev + 1);
+                }}
                 disabled={!canProceedToNextStep()}
                 className="bg-indigo-600 hover:bg-indigo-700 flex items-center"
               >
@@ -838,24 +853,25 @@ export default function Calculator() {
             <Button
               className="bg-indigo-600 hover:bg-indigo-700"
               variant="outline"
-              onClick={() => {
-                // Reset everything
-                setBattingSelection({
-                  powerplay: Array(4).fill(null),
-                  middleOvers: Array(4).fill(null),
-                  deathOvers: Array(3).fill(null),
-                });
-                setBowlingSelection({
-                  powerplay: Array(3).fill(null),
-                  middleOvers: Array(3).fill(null),
-                  deathOvers: Array(4).fill(null),
-                });
-                setTeamScore(0);
-                setShowScoreDetails(false);
-                setCurrentStep(0);
-              }}
+              // onClick={() => {
+              //   // Reset everything
+              //   setBattingSelection({
+              //     powerplay: Array(4).fill(null),
+              //     middleOvers: Array(4).fill(null),
+              //     deathOvers: Array(3).fill(null),
+              //   });
+              //   setBowlingSelection({
+              //     powerplay: Array(3).fill(null),
+              //     middleOvers: Array(3).fill(null),
+              //     deathOvers: Array(4).fill(null),
+              //   });
+              //   setTeamScore(0);
+              //   setShowScoreDetails(false);
+              //   setCurrentStep(0);
+              // }}
+              onClick={handleSubmit}
             >
-              Start Over
+              Submit
             </Button>
           )}
         </div>

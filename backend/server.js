@@ -8,6 +8,7 @@ import teamRoutes from "./routes/teamRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import powerCardRoutes from "./routes/powerCardRoutes.js";
 import { login } from "./controllers/authController.js";
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 mongoose.set("strictQuery", false); // Suppress Mongoose warning
@@ -23,6 +24,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+//Enabling cookieParser
+app.use(cookieParser())
+
 // Routes
 app.use("/api/players", playerRoutes);
 app.use("/api/teams", teamRoutes);
@@ -34,8 +38,10 @@ app.use((err, req, res, _next) => {
   res.status(500).json({ message: err.message || "Internal Server Error" });
 });
 
+app.get("/api/temp" , (req , res) => res.json({msg : "Success"}))
+
 // ✅ Ensure Port is Free Before Listening
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 const server = app
   .listen(PORT, () => {

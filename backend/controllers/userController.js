@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import cookie from "cookie";
 
 export const getUsers = async (req, res) => {
   try {
@@ -85,3 +86,21 @@ export const updateUserWallet = async (req, res) => {
     res.status(400).json({ message: "Invalid User data" });
   }
 };
+
+export const updateScore = async (req , res ) =>{
+  const {id} = req.params;
+  const {score} = req.body
+  
+  const user = await User.findOne({_id : id})
+  if(!user){
+    res.status(404).json({msg : "user not found"});
+  }
+  if(!score){
+    score = 0;
+  }
+
+  user.Score = score;
+  await user.save();
+
+  res.status(200).json({msg:"Route working and score update" , newScore : user.Score })
+}

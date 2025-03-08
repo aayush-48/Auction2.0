@@ -28,6 +28,8 @@ const AssignTeam = () => {
     try {
       const teamsRes = await getTeams();
       const usersRes = await getUsers();
+      console.log(usersRes);
+      
       setTeams(teamsRes.data);
       setUsers(usersRes.data);
     } catch (error) {

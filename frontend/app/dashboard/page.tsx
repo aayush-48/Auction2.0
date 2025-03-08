@@ -25,6 +25,8 @@ export default function Dashboard() {
   }
   const players = userPlayers;
   console.log(players);
+  // console.log(user);
+  
   const slot_num = user.slot_num;
   const batsmen = players.filter(
     (player) => player.type === "Batsman" || player.type === "Wicket Keeper"
