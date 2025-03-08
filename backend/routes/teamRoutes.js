@@ -6,11 +6,8 @@ import {
   updateTeam,
   deleteTeam,
   assignTeam,
-<<<<<<< HEAD
   getTeamsOfSlot,
-=======
   getPlayersByTeam,
->>>>>>> cab5e6b1a36d45fa7854818e53462e9a0032d4ba
 } from "../controllers/teamController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 
@@ -23,10 +20,7 @@ router
   .put(protect, admin, updateTeam)
   .delete(protect, admin, deleteTeam);
 router.route("/assign/:id").post(protect, admin, assignTeam);
-<<<<<<< HEAD
 
 router.route("/slot/:slot").get(getTeamsOfSlot)
-=======
 router.route("/players/:id").get(getPlayersByTeam);
->>>>>>> cab5e6b1a36d45fa7854818e53462e9a0032d4ba
 export default router;

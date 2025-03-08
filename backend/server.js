@@ -10,11 +10,8 @@ import teamRoutes from "./routes/teamRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import powerCardRoutes from "./routes/powerCardRoutes.js";
 import { login } from "./controllers/authController.js";
-<<<<<<< HEAD
 import cookieParser from "cookie-parser";
-=======
 
->>>>>>> cab5e6b1a36d45fa7854818e53462e9a0032d4ba
 dotenv.config();
 
 mongoose.set("strictQuery", false);
@@ -46,32 +43,6 @@ app.use((err, req, res, _next) => {
   res.status(500).json({ message: err.message || "Internal Server Error" });
 });
 
-<<<<<<< HEAD
-app.get("/api/temp" , (req , res) => res.json({msg : "Success"}))
-
-// ✅ Ensure Port is Free Before Listening
-const PORT = process.env.PORT || 5001;
-
-const server = app
-  .listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  })
-  .on("error", (err) => {
-    if (err.code === "EADDRINUSE") {
-      console.error(
-        `⚠️ Port ${PORT} is already in use. Trying another port...`
-      );
-      setTimeout(() => {
-        server.close(() => {
-          app.listen(PORT + 1, () => {
-            console.log(`✅ Server restarted on port ${PORT + 1}`);
-          });
-        });
-      }, 1000);
-    }
-  });
-=======
 // Start server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
->>>>>>> cab5e6b1a36d45fa7854818e53462e9a0032d4ba
