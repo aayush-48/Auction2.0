@@ -71,19 +71,16 @@ const nextConfig = {
         hostname: "www.bdcrictime.com",
       },
       {
-<<<<<<< HEAD
         protocol : "https",
         hostname : "assets-webp.khelnow.com"
       },
       {
         protocol:"https",
         hostname :"encrypted-tbn0.gstatic.com"
-      }
-=======
+      },{
         protocol: "https",
         hostname: "assets-webp.khelnow.com",
       },
->>>>>>> cab5e6b1a36d45fa7854818e53462e9a0032d4ba
     ],
   },
 };
