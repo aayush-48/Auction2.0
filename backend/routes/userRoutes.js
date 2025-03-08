@@ -6,6 +6,7 @@ import {
   updateUser,
   deleteUser,
   updateUserWallet,
+  updateScore,
 } from "../controllers/userController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 import { login } from "../controllers/authController.js";
@@ -17,6 +18,11 @@ router
   .get(getUserById)
   .put(protect, admin, updateUser)
   .delete(protect, admin, deleteUser);
+
 router.route("/updateWallet/:id").post(protect, admin, updateUserWallet);
+
 router.route("/login").post(login);
+
+router.route("/score/:id").post(updateScore)
+
 export default router;

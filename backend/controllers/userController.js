@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import cookie from "cookie";
 
 export const getUsers = async (req, res) => {
   try {
@@ -86,70 +87,22 @@ export const updateUserWallet = async (req, res) => {
   }
 };
 
-export const handleSubmit = async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const { score } = req.body;
+export const updateScore = async (req, res) => {
+  const { id } = req.params;
+  const { score } = req.body;
 
-    // Fetch user data (assuming user model has player_ids)
-    const user = await User.findById(userId).populate("player_ids");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const players = user.player_ids;
-
-    // Count players based on their attributes
-    let counts = {
-      batsman: 0,
-      bowler: 0,
-      allrounder: 0,
-      wicketkeeper: 0,
-      foreign: 0,
-      women: 0,
-      underdogs: 0,
-      legendary: 0,
-    };
-
-    players.forEach((player) => {
-      if (player.type === "Batsman") counts.batsman++;
-      if (player.type === "Bowler") counts.bowler++;
-      if (player.type === "All Rounder") counts.allrounder++;
-      if (player.type === "Wicket Keeper") counts.wicketkeeper++;
-
-      if (player.country !== "ind") counts.foreign++;
-      if (player.gender === "female") counts.women++;
-      if (player.isUnderdog) counts.underdogs++;
-      if (player.isLegendary) counts.legendary++;
-    });
-
-    // Define constraints and penalties
-    const violations = [];
-    if (counts.batsman < 2 || counts.batsman > 4)
-      violations.push("Batsman count out of range");
-    if (counts.bowler < 2 || counts.bowler > 4)
-      violations.push("Bowler count out of range");
-    if (counts.allrounder < 2 || counts.allrounder > 3)
-      violations.push("All-Rounder count out of range");
-    if (counts.wicketkeeper !== 1)
-      violations.push("Wicket-Keeper count must be 1");
-    if (counts.foreign > 4) violations.push("Foreign players exceed limit");
-    if (counts.women < 1) violations.push("At least one woman required");
-    if (counts.underdogs < 1) violations.push("At least one underdog required");
-    if (counts.legendary < 1)
-      violations.push("At least one legendary player required");
-
-    // Deduct points based on violations
-    let penalty = violations.length * 10; // Deduct 10 points per violation
-    const newScore = Math.max(0, score - penalty); // Ensure score doesn't go below 0
-
-    // Update user's score
-    user.Score = newScore;
-    await user.save();
-
-    res.status(200).json({ message: "Score updated", newScore, violations });
-  } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({ message: "Internal server error" });
+  const user = await User.findOne({ _id: id });
+  if (!user) {
+    res.status(404).json({ msg: "user not found" });
   }
+  if (!score) {
+    score = 0;
+  }
+
+  user.Score = score;
+  await user.save();
+
+  res
+    .status(200)
+    .json({ msg: "Route working and score update", newScore: user.Score });
 };

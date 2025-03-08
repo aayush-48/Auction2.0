@@ -7,6 +7,7 @@ import {
   getTeams,
   getUserById,
   getPlayersByUser,
+  getOtherTeamsFromSameSlot,
 } from "../app/api/api";
 
 export interface Player {
@@ -56,6 +57,11 @@ export interface User {
   ipl_team_id: string;
 }
 
+interface LeaderboardData {
+  teamName: String;
+  score : Number | String;
+}
+
 interface AuctionContextType {
   user: User;
   userPlayers: Player[];
@@ -65,6 +71,7 @@ interface AuctionContextType {
   setTeams: React.Dispatch<React.SetStateAction<Team[]>>;
   loading: boolean;
   error: string | null;
+  teamsOfSameSlot : LeaderboardData[];
 }
 
 const AuctionContext = createContext<AuctionContextType | undefined>(undefined);
@@ -86,6 +93,7 @@ export const AuctionProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [userPlayers, setUserPlayers] = useState<Player[]>([]);
+  const [teamsOfSameSlot , setTeamsOfSameSlot] = useState<LeaderboardData[]>([])
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -99,16 +107,21 @@ export const AuctionProvider: React.FC<{ children: React.ReactNode }> = ({
           teamsResponse,
           userResponse,
           userPlayersResponse,
+          sortedSlotTeamsResponse
         ] = await Promise.all([
           getPlayers(),
           getTeams(),
           getUserById(id),
           getPlayersByUser(id),
+          getOtherTeamsFromSameSlot(localStorage.getItem("slot")|| "")
         ]);
         setPlayers(playersResponse.data);
         setTeams(teamsResponse.data);
         setUser(userResponse.data);
         setUserPlayers(userPlayersResponse.data);
+        setTeamsOfSameSlot(sortedSlotTeamsResponse.data)
+        // console.log(sortedSlotTeamsResponse);
+        
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Failed to fetch data. Please try again later.");
@@ -131,6 +144,7 @@ export const AuctionProvider: React.FC<{ children: React.ReactNode }> = ({
         setTeams,
         loading,
         error,
+        teamsOfSameSlot
       }}
     >
       {children}

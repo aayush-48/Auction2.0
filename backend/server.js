@@ -10,6 +10,7 @@ import teamRoutes from "./routes/teamRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import powerCardRoutes from "./routes/powerCardRoutes.js";
 import { login } from "./controllers/authController.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -26,6 +27,9 @@ const server = createServer(app); // Create HTTP server for WebSockets
 
 app.use(cors());
 app.use(express.json());
+
+//Enabling cookieParser
+app.use(cookieParser())
 
 // Routes
 app.use("/api/players", playerRoutes);

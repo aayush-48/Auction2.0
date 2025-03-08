@@ -6,7 +6,8 @@ export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
-
+    // console.log(user);
+    
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = jwt.sign(
         { id: user._id, role: user.role },
@@ -18,6 +19,7 @@ export const login = async (req, res) => {
         token,
         id: user._id,
         role: user.role,
+        slot : user.slot_num
       });
     } else {
       console.error("Login failed: Invalid credentials"); // Prints error if login fails

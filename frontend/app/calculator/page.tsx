@@ -11,6 +11,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+import { setUserScore } from "../api/api";
 import { getPlayersByUser } from "../api/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,8 @@ import {
   BarChart3Icon,
   CheckCircleIcon,
 } from "lucide-react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const fetchUserPlayers = async (id: string) => {
   const response = await getPlayersByUser(id);
@@ -41,18 +44,18 @@ const calculateOverallRating = (player) => {
   ) {
     const battingAvg =
       (batting.powerplay + batting.middleOvers + batting.deathOvers) / 3;
-    overallRating = (battingAvg + rtmElite + captaincy) / 3;
+    overallRating = (battingAvg + (rtmElite || 0) + (captaincy || 0)) / 3;
   } else if (type.toLowerCase() === "bowler") {
     const bowlingAvg =
       (bowling.powerplay + bowling.middleOvers + bowling.deathOvers) / 3;
-    overallRating = (bowlingAvg + rtmElite + captaincy) / 3;
+    overallRating = (bowlingAvg + (rtmElite || 0) + (captaincy || 0)) / 3;
   } else {
     // All-rounder
     const battingAvg =
       (batting.powerplay + batting.middleOvers + batting.deathOvers) / 3;
     const bowlingAvg =
       (bowling.powerplay + bowling.middleOvers + bowling.deathOvers) / 3;
-    overallRating = (battingAvg + bowlingAvg + rtmElite + captaincy) / 4;
+    overallRating = (battingAvg + bowlingAvg +(rtmElite || 0) + (captaincy || 0)) / 4;
   }
 
   return (Math.round(overallRating * 10) / 10).toFixed(1);
@@ -71,6 +74,8 @@ const getTypeColor = (type) => {
 };
 
 export default function Calculator() {
+  const router = useRouter();
+  const { userPlayers } = useAuction();
   const { user } = useAuction();
   const [availablePlayers, setAvailablePlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -761,6 +766,26 @@ export default function Calculator() {
     );
   };
 
+  const handleSubmit = async(e)=>{
+    console.log(teamScore);
+    const res = await setUserScore(localStorage.getItem("id")|| "" , teamScore);
+    console.log(res);
+    if(res.status === 200){
+      localStorage.setItem("userScore",res.data.newScore )
+      router.push("/leaderboard");
+    } else {
+      router.refresh();
+    }
+  }
+
+  useEffect(() =>{
+    console.log(localStorage.getItem("userScore") === null);
+    
+    if( localStorage.getItem("userScore") != null ){
+      router.push("/leaderboard")
+    }
+  } , [])
+
   return (
     <div className="space-y-4 max-w-6xl mx-auto my-10">
       <motion.div
@@ -865,24 +890,25 @@ export default function Calculator() {
             <Button
               className="bg-indigo-600 hover:bg-indigo-700"
               variant="outline"
-              onClick={() => {
-                // Reset everything
-                setBattingSelection({
-                  powerplay: Array(4).fill(null),
-                  middleOvers: Array(4).fill(null),
-                  deathOvers: Array(3).fill(null),
-                });
-                setBowlingSelection({
-                  powerplay: Array(3).fill(null),
-                  middleOvers: Array(3).fill(null),
-                  deathOvers: Array(4).fill(null),
-                });
-                setTeamScore(0);
-                setShowScoreDetails(false);
-                setCurrentStep(0);
-              }}
+              // onClick={() => {
+              //   // Reset everything
+              //   setBattingSelection({
+              //     powerplay: Array(4).fill(null),
+              //     middleOvers: Array(4).fill(null),
+              //     deathOvers: Array(3).fill(null),
+              //   });
+              //   setBowlingSelection({
+              //     powerplay: Array(3).fill(null),
+              //     middleOvers: Array(3).fill(null),
+              //     deathOvers: Array(4).fill(null),
+              //   });
+              //   setTeamScore(0);
+              //   setShowScoreDetails(false);
+              //   setCurrentStep(0);
+              // }}
+              onClick={handleSubmit}
             >
-              Start Over
+              Submit
             </Button>
           )}
         </div>

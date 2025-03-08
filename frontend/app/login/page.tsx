@@ -20,11 +20,13 @@ export default function Login() {
     try {
       setLoading(true);
       const { data } = await login(username, password);
-
+      console.log(data);
+      
       // Save token to localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("id", data.id);
       localStorage.setItem("role", data.role); // Store role for redirection
+      localStorage.setItem("slot" , data.slot)
 
       // Redirect based on role
       if (data.role === "admin") {
