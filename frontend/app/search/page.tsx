@@ -5,6 +5,8 @@ import { motion } from "framer-motion"
 import { useAuction } from "../../context/AuctionContext"
 import PlayerCard from "../../components/PlayerCard"
 import playerData from "../../data/playerData"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function Search() {
   const { players } = useAuction()
@@ -13,6 +15,14 @@ export default function Search() {
     role: "",
     team: "",
   })
+  const router = useRouter()
+  useEffect(() =>{
+        console.log(localStorage.getItem("userScore") === null);
+        
+        if( localStorage.getItem("userScore") != null ){
+          router.push("/leaderboard")
+        }
+  } , [])
 
   const allPlayers = playerData.flatMap((set) => set.players)
   const playerMap = new Map(allPlayers.map((player) => [player.name, player]))

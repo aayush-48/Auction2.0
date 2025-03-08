@@ -55,6 +55,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   rtmTeam,
   isElite,
   src,
+  overallRating
 }) => {
   const finalPriceNum =
     finalPrice.find((slot) => Number(slot.slot_num) === slot_num)?.price || 0;
@@ -129,7 +130,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           <h3 className="text-xl font-bold text-heliotrope">{name}</h3>
           <p className="text-sm text-mauve">{`${country} | ${gender} | ${type}`}</p>
           <p className="text-lg text-heliotrope">
-            Overall Rating: {calculateOverallRating()}
+            {/* Overall Rating: {calculateOverallRating()} */}
+            Overall Rating: {overallRating}
           </p>
         </div>
       </div>

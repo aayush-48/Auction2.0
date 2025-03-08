@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useAuction } from "../../context/AuctionContext";
 import PlayerCard from "../../components/PlayerCard";
+import { useRouter } from "next/navigation";
 import {
   GiCricketBat,
   GiBowlingPin,
@@ -11,9 +12,19 @@ import {
 } from "react-icons/gi";
 import type React from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { useEffect } from "react";
 
 export default function Dashboard() {
   const { userPlayers, loading, error, user } = useAuction();
+  const router = useRouter();
+  useEffect(() =>{
+      console.log(localStorage.getItem("userScore") === null);
+      
+      if( localStorage.getItem("userScore") != null ){
+        router.push("/leaderboard")
+      }
+  } , [])
+
   if (!user) {
     return (
       <div>
@@ -37,7 +48,7 @@ export default function Dashboard() {
   // Mock data for purse and powercards (replace with actual data from your context)
   const totalPurse = user.Purse;
   const teamValue = players.reduce((sum, player) => {
-    console.log(user);
+    // console.log(user);
     const slotPrice =
       player.finalPrice.find((slot) => Number(slot.slot_num) === slot_num)
         ?.price || 0;
@@ -67,6 +78,7 @@ export default function Dashboard() {
             key={player.id}
             {...player}
             slot_num={slot_num}
+            overallRating={player.overallRating}
             rtmTeam={
               player.rtmTeam as
                 | "CSK"

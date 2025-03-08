@@ -91,3 +91,40 @@ export const assignTeam = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+export const getTeamsOfSlot = async(req , res) =>{
+  const {slot : slot_num} = req.params
+
+  const users = await User.find({slot_num , role : "player"})
+  const teams = await Team.find()
+  // console.log(teams);
+
+  if(!teams || teams.length === 0){
+    return res.status(404).json({msg : "No teams"})
+  }
+  if(!users || users.length === 0){
+    return res.status(404).json({msg : "Players not found."})
+  }
+  
+  const teamWiseScore = {}
+
+  teams.forEach((team) => {
+    teamWiseScore[team.name] = 0;
+  });
+
+  // Accumulate scores for each team
+  users.forEach((user) => {
+    const team = teams.find((team) => team._id.equals(user.ipl_team_id));
+    if (team) {
+      teamWiseScore[team.name] += user.Score || 0; // Add user's score to the team
+    }
+  });
+
+  const sortedTeams = Object.entries(teamWiseScore)
+      .map(([teamName, score]) => ({ teamName, score }))
+      .sort((a, b) => b.score - a.score); 
+  
+
+  res.status(200).json({msg : "Route is working" , sortedTeams })
+}

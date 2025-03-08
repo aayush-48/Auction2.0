@@ -57,4 +57,8 @@ export const setUserScore = (id : string , score: number=0) => api.post(`/users/
   score : score
 })  
 
+export const getOtherTeamsFromSameSlot = (slot : String | Number) => {
+  return api.get(`/teams/slot/${slot}`)
+}
+
 export default api;
