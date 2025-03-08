@@ -29,7 +29,7 @@ app.use(cors());
 app.use(express.json());
 
 //Enabling cookieParser
-app.use(cookieParser())
+app.use(cookieParser());
 
 // Routes
 app.use("/api/players", playerRoutes);
@@ -44,5 +44,5 @@ app.use((err, req, res, _next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

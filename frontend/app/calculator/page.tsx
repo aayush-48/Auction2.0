@@ -33,34 +33,6 @@ const fetchUserPlayers = async (id: string) => {
   return response.data;
 };
 
-const calculateOverallRating = (player) => {
-  const { ratings, type } = player;
-  const { batting, bowling, rtmElite, captaincy } = ratings;
-  let overallRating;
-
-  if (
-    type.toLowerCase() === "batsman" ||
-    type.toLowerCase() === "wicket-keeper"
-  ) {
-    const battingAvg =
-      (batting.powerplay + batting.middleOvers + batting.deathOvers) / 3;
-    overallRating = (battingAvg + (rtmElite || 0) + (captaincy || 0)) / 3;
-  } else if (type.toLowerCase() === "bowler") {
-    const bowlingAvg =
-      (bowling.powerplay + bowling.middleOvers + bowling.deathOvers) / 3;
-    overallRating = (bowlingAvg + (rtmElite || 0) + (captaincy || 0)) / 3;
-  } else {
-    // All-rounder
-    const battingAvg =
-      (batting.powerplay + batting.middleOvers + batting.deathOvers) / 3;
-    const bowlingAvg =
-      (bowling.powerplay + bowling.middleOvers + bowling.deathOvers) / 3;
-    overallRating = (battingAvg + bowlingAvg +(rtmElite || 0) + (captaincy || 0)) / 4;
-  }
-
-  return (Math.round(overallRating * 10) / 10).toFixed(1);
-};
-
 // Helper function to get player type badge color
 const getTypeColor = (type) => {
   const typeMap = {
@@ -75,7 +47,6 @@ const getTypeColor = (type) => {
 
 export default function Calculator() {
   const router = useRouter();
-  const { userPlayers } = useAuction();
   const { user } = useAuction();
   const [availablePlayers, setAvailablePlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -319,7 +290,7 @@ export default function Calculator() {
     ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
       battingSelection[category].forEach((player) => {
         if (!player) return;
-        newBaseScore += player.ratings.batting[category];
+        newBaseScore += player.overallRating;
       });
     });
 
@@ -327,7 +298,7 @@ export default function Calculator() {
     ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
       bowlingSelection[category].forEach((player) => {
         if (!player) return;
-        newBaseScore += player.ratings.bowling[category];
+        newBaseScore += player.overallRating;
       });
     });
 
@@ -380,105 +351,6 @@ export default function Calculator() {
     });
 
     setTeamScore(newBaseScore + battingBonus + bowlingBonus);
-  };
-
-  const calculateTeamScore = () => {
-    // Get all selected players from batting and bowling categories
-    const battingPlayers = Object.values(battingSelection)
-      .flat()
-      .filter((p) => p !== null);
-
-    const bowlingPlayers = Object.values(bowlingSelection)
-      .flat()
-      .filter((p) => p !== null);
-
-    // Check if all positions are filled
-    const allBattingSlots = Object.values(battingSelection).flat().length;
-    const allBowlingSlots = Object.values(bowlingSelection).flat().length;
-    const filledBattingSlots = battingPlayers.length;
-    const filledBowlingSlots = bowlingPlayers.length;
-
-    if (
-      filledBattingSlots < allBattingSlots ||
-      filledBowlingSlots < allBowlingSlots
-    ) {
-      alert(
-        "Please fill all batting and bowling positions before calculating the score."
-      );
-      return;
-    }
-
-    // Calculate base score
-    let baseScore = 0;
-
-    // Batting section scores
-    ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
-      battingSelection[category].forEach((player) => {
-        if (!player) return;
-        baseScore += player.ratings.batting[category];
-      });
-    });
-
-    // Bowling section scores
-    ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
-      bowlingSelection[category].forEach((player) => {
-        if (!player) return;
-        baseScore += player.ratings.bowling[category];
-      });
-    });
-
-    // Bonus Calculation Function
-    const calculateBonus = (players, category) => {
-      const validPlayers = players.filter((p) => p !== null);
-      if (validPlayers.length === 0) return 0;
-
-      const maxPoints = validPlayers.length * 10;
-      const actualPoints = validPlayers.reduce(
-        (sum, player) =>
-          sum +
-          player.ratings[category === "batting" ? "batting" : "bowling"][
-            players === battingSelection.powerplay ||
-            players === bowlingSelection.powerplay
-              ? "powerplay"
-              : players === battingSelection.middleOvers ||
-                players === bowlingSelection.middleOvers
-              ? "middleOvers"
-              : "deathOvers"
-          ],
-        0
-      );
-
-      const percentage = (actualPoints / maxPoints) * 100;
-
-      if (percentage > 90) return 5;
-      if (percentage > 80) return 3;
-      if (percentage >= 70) return 1;
-      return 0;
-    };
-
-    // Calculate Batting Bonuses
-    const battingBonus =
-      calculateBonus(battingSelection.powerplay, "batting") +
-      calculateBonus(battingSelection.middleOvers, "batting") +
-      calculateBonus(battingSelection.deathOvers, "batting");
-
-    // Calculate Bowling Bonuses
-    const bowlingBonus =
-      calculateBonus(bowlingSelection.powerplay, "bowling") +
-      calculateBonus(bowlingSelection.middleOvers, "bowling") +
-      calculateBonus(bowlingSelection.deathOvers, "bowling");
-
-    // Set score breakdown
-    setScoreBreakdown({
-      baseScore: Math.round(baseScore * 100) / 100,
-      battingBonus,
-      bowlingBonus,
-    });
-
-    // Final Team Score
-    setTeamScore(baseScore + battingBonus + bowlingBonus);
-    setShowScoreDetails(true);
-    setCurrentStep(6); // Move to results step
   };
 
   const isStepComplete = (stepIndex) => {
@@ -545,7 +417,7 @@ export default function Calculator() {
             <p className="text-xs text-gray-500">{player.country}</p>
             <div className="flex justify-center mt-2">
               <Badge variant="outline" className="bg-amber-100 text-black">
-                Rating: {calculateOverallRating(player)}
+                Rating: {player.overallRating}
               </Badge>
             </div>
           </CardContent>
@@ -766,25 +638,25 @@ export default function Calculator() {
     );
   };
 
-  const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
     console.log(teamScore);
-    const res = await setUserScore(localStorage.getItem("id")|| "" , teamScore);
+    const res = await setUserScore(localStorage.getItem("id") || "", teamScore);
     console.log(res);
-    if(res.status === 200){
-      localStorage.setItem("userScore",res.data.newScore )
+    if (res.status === 200) {
+      localStorage.setItem("userScore", res.data.newScore);
       router.push("/leaderboard");
     } else {
       router.refresh();
     }
-  }
+  };
 
-  useEffect(() =>{
+  useEffect(() => {
     console.log(localStorage.getItem("userScore") === null);
-    
-    if( localStorage.getItem("userScore") != null ){
-      router.push("/leaderboard")
+
+    if (localStorage.getItem("userScore") != null) {
+      router.push("/leaderboard");
     }
-  } , [])
+  }, []);
 
   return (
     <div className="space-y-4 max-w-6xl mx-auto my-10">
@@ -877,35 +749,27 @@ export default function Calculator() {
               </Button>
             </>
           ) : currentStep === 5 ? (
-            <Button
-              onClick={calculateTeamScore}
-              disabled={!canProceedToNextStep()}
-              className="bg-indigo-600 hover:bg-indigo-700"
-            >
-              Calculate Team Score
-              <BarChart3Icon size={16} className="ml-2" />
-            </Button>
+            <>
+              <div className="flex gap-5">
+                <p className="text-gray-500 mt-2">Total Team Score</p>
+                <div className="text-3xl font-bold text-indigo-600">
+                  {Math.round(teamScore * 100) / 100}
+                </div>
+              </div>
+              <Button
+                onClick={() => setCurrentStep(6)}
+                disabled={!canProceedToNextStep()}
+                className="bg-indigo-600 hover:bg-indigo-700"
+              >
+                Calculate Team Score
+                <BarChart3Icon size={16} className="ml-2" />
+              </Button>
+            </>
           ) : (
             //put submit
             <Button
               className="bg-indigo-600 hover:bg-indigo-700"
               variant="outline"
-              // onClick={() => {
-              //   // Reset everything
-              //   setBattingSelection({
-              //     powerplay: Array(4).fill(null),
-              //     middleOvers: Array(4).fill(null),
-              //     deathOvers: Array(3).fill(null),
-              //   });
-              //   setBowlingSelection({
-              //     powerplay: Array(3).fill(null),
-              //     middleOvers: Array(3).fill(null),
-              //     deathOvers: Array(4).fill(null),
-              //   });
-              //   setTeamScore(0);
-              //   setShowScoreDetails(false);
-              //   setCurrentStep(0);
-              // }}
               onClick={handleSubmit}
             >
               Submit
