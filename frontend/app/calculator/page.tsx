@@ -706,7 +706,7 @@ export default function Calculator() {
     return (
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-medium mb-2">
+          <h3 className="text-lg font-medium mb-2 text-black">
             Assign Players for {step.name}
           </h3>
           <p className="text-sm text-gray-500 mb-4">
@@ -769,13 +769,15 @@ export default function Calculator() {
         transition={{ duration: 0.5 }}
         className="bg-white rounded-lg shadow-lg overflow-hidden"
       >
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4">
-          <h2 className="text-xl font-bold text-white">
-            Cricket Team Calculator
-          </h2>
-          <p className="text-purple-100 text-sm">
-            Build and optimize your dream cricket team
-          </p>
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 flex justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white">
+              Cricket Team Calculator
+            </h2>
+            <p className="text-purple-100 text-sm">
+              Build and optimize your dream cricket team
+            </p>
+          </div>
           <Button
             className="m-5"
             variant={"outline"}

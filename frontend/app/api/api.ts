@@ -54,6 +54,8 @@ export const updateTeam = (id: string, teamData: any) =>
 export const deleteTeam = (id: string) => api.delete(`/teams/${id}`);
 export const assignTeam = (id: string, teamData: any) =>
   api.post(`/teams/assign/${id}`, teamData);
+export const getPlayersByTeam = (id: string, slot: number) =>
+  api.get(`/teams/players/${id}`, { params: { slot: slot } });
 
 export const getPowerCards = () => api.get("/powerCards");
 export const createPowerCard = (powerCardData: any) =>
