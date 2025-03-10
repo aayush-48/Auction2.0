@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { useAuction } from "../../context/AuctionContext"
-import PlayerCard from "../../components/PlayerCard"
-import playerData from "../../data/playerData"
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { useAuction } from "../../context/AuctionContext";
+import PlayerCard from "../../components/PlayerCard";
+import playerData from "../../data/playerData";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Search() {
   const { players } = useAuction();
@@ -14,15 +14,15 @@ export default function Search() {
   const [filters, setFilters] = useState({
     role: "",
     team: "",
-  })
-  const router = useRouter()
-  useEffect(() =>{
-        console.log(localStorage.getItem("userScore") === null);
-        
-        if( localStorage.getItem("userScore") != null ){
-          router.push("/leaderboard")
-        }
-  } , [])
+  });
+  const router = useRouter();
+  useEffect(() => {
+    console.log(localStorage.getItem("userScore") === null);
+
+    if (localStorage.getItem("userScore") != null) {
+      router.push("/leaderboard");
+    }
+  }, []);
 
   const allPlayers = playerData.flatMap((set) => set.players);
   const playerMap = new Map(allPlayers.map((player) => [player.name, player]));
@@ -64,8 +64,8 @@ export default function Search() {
             <option value="">All Roles</option>
             <option value="Batsman">Batsman</option>
             <option value="Bowler">Bowler</option>
-            <option value="All-rounder">All-rounder</option>
-            <option value="Wicket-keeper">Wicket-keeper</option>
+            <option value="All Rounder">All-rounder</option>
+            <option value="Wicket Keeper">Wicket-keeper</option>
           </select>
           <select
             value={filters.team}

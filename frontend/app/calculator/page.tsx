@@ -3,14 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuction, type Player } from "../../context/AuctionContext";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { setUserScore } from "../api/api";
 import { getPlayersByUser } from "../api/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,8 +18,15 @@ import {
   BarChart3Icon,
   CheckCircleIcon,
 } from "lucide-react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const fetchUserPlayers = async (id: string) => {
   const response = await getPlayersByUser(id);
@@ -52,6 +52,8 @@ export default function Calculator() {
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [teamScore, setTeamScore] = useState(0);
   const [currentStep, setCurrentStep] = useState(0); // Start at step 0 (which is now batting powerplay)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [battingSelection, setBattingSelection] = useState({
     powerplay: Array(4).fill(null),
     middleOvers: Array(4).fill(null),
@@ -640,13 +642,21 @@ export default function Calculator() {
 
   const handleSubmit = async (e) => {
     console.log(teamScore);
-    const res = await setUserScore(localStorage.getItem("id") || "", teamScore);
-    console.log(res);
-    if (res.status === 200) {
-      localStorage.setItem("userScore", res.data.newScore);
-      router.push("/leaderboard");
-    } else {
-      router.refresh();
+    let res;
+    try {
+      res = await setUserScore(localStorage.getItem("id") || "", teamScore);
+      if (res.status === 200) {
+        localStorage.setItem("userScore", res.data.newScore);
+        router.push("/leaderboard");
+      } else {
+        router.refresh();
+      }
+    } catch (err) {
+      if (err && err.response && err.response.status == 400) {
+        setErrorMsg(err.response.data.msg);
+        setIsDialogOpen(true);
+      }
+      console.error(err);
     }
   };
 
@@ -767,13 +777,23 @@ export default function Calculator() {
             </>
           ) : (
             //put submit
-            <Button
-              className="bg-indigo-600 hover:bg-indigo-700"
-              variant="outline"
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
+            <>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                  <DialogTitle>Alert</DialogTitle>
+                  <DialogDescription>
+                    {errorMsg}, you are now disqualified and cannot submit.
+                  </DialogDescription>
+                </DialogContent>
+              </Dialog>
+              <Button
+                className="bg-indigo-600 hover:bg-indigo-700"
+                variant="outline"
+                onClick={handleSubmit}
+              >
+                Submit
+              </Button>
+            </>
           )}
         </div>
       </motion.div>
