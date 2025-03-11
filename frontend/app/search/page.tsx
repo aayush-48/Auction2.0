@@ -33,8 +33,9 @@ export default function Search() {
       .includes(searchTerm.toLowerCase());
     const matchesRole = !filters.role || player.type === filters.role;
     const matchesTeam = !filters.team || player.team === filters.team;
+    const isValidPlayer = !(player.isLegendary || player.isUnderdog); // Exclude players who are both Legendary and Underdog
 
-    return matchesSearch && matchesRole && matchesTeam;
+    return matchesSearch && matchesRole && matchesTeam && isValidPlayer;
   });
 
   return (
