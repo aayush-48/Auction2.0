@@ -8,11 +8,19 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "iplcricbet.com",
+      },
+      {
+        protocol: "https",
         hostname: "documents.iplt20.com",
       },
       {
         protocol: "https",
         hostname: "femalecricket.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.cdn.newsbytesapp.com",
       },
       {
         protocol: "https",
@@ -71,13 +79,14 @@ const nextConfig = {
         hostname: "www.bdcrictime.com",
       },
       {
-        protocol : "https",
-        hostname : "assets-webp.khelnow.com"
+        protocol: "https",
+        hostname: "assets-webp.khelnow.com",
       },
       {
-        protocol:"https",
-        hostname :"encrypted-tbn0.gstatic.com"
-      },{
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+      },
+      {
         protocol: "https",
         hostname: "assets-webp.khelnow.com",
       },{

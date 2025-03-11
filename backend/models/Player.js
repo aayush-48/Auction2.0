@@ -19,11 +19,11 @@ const playerSchema = new mongoose.Schema({
       middleOvers: { type: Number, required: true },
       deathOvers: { type: Number, required: true },
     },
-    rtmElite: { type: Number },
-    captaincy: { type: Number },
   },
   rtmTeam: { type: String },
-  isElite: { type: Boolean, default: false },
+  isLegendary: { type: Boolean, default: false },
+  isUnderdog: { type: Boolean, default: false },
+  overallRating: { type: Number },
 });
 
 export default mongoose.model("Player", playerSchema);

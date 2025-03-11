@@ -87,7 +87,6 @@ export const deletePlayer = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 export const assignPlayer = async (req, res) => {
   try {
     const { selectedTeam, selectedSlot, finalPrice } = req.body;
@@ -118,14 +117,89 @@ export const assignPlayer = async (req, res) => {
         .json({ message: "Player is already assigned to this user." });
     }
 
-    // Add the player ID and save
+    // Fetch the player details
+    const player = await Player.findOne({ _id: playerId });
+    if (!player) {
+      return res.status(400).json({ message: "Player not found." });
+    }
+
+    // Category Limits
+    const categoryLimits = {
+      Batsman: { max: 4 },
+      Bowler: { max: 4 },
+      "All Rounder": { max: 3 },
+      "Wicket Keeper": { max: 1 },
+      Foreign: { max: 4 },
+      Women: { max: 1 },
+      Underdogs: { max: 1 },
+      Legendary: { max: 1 },
+    };
+
+    // Count players in each category
+    const userPlayers = await Player.find({
+      _id: { $in: selectedUser.player_ids },
+    });
+
+    const categoryCount = {
+      Batsman: 0,
+      Bowler: 0,
+      "All Rounder": 0,
+      "Wicket Keeper": 0,
+      Foreign: 0,
+      Women: 0,
+      Underdogs: 0,
+      Legendary: 0,
+    };
+
+    userPlayers.forEach((p) => {
+      categoryCount[p.type] += 1;
+      if (p.country !== "ind") categoryCount["Foreign"] += 1;
+      if (p.gender === "female") categoryCount["Women"] += 1;
+      if (p.isUnderdog) categoryCount["Underdogs"] += 1;
+      if (p.isLegendary) categoryCount["Legendary"] += 1;
+    });
+
+    if (
+      player.type === "Batsman" ||
+      player.type === "Bowler" ||
+      player.type === "All Rounder" ||
+      player.type === "Wicket Keeper"
+    ) {
+      console.log(categoryCount);
+      if (categoryCount[player.type] >= categoryLimits[player.type].max) {
+        selectedUser.Score -= 100; // Deduct 100 score points
+        await selectedUser.save();
+        return res.status(400).json({
+          message: `Cannot add more ${player.type}s. Maximum limit reached.`,
+        });
+      }
+    }
+
+    // Identify the category of the new player
+    let playerCategory = player.type;
+    if (player.country !== "ind") playerCategory = "Foreign";
+    if (player.gender === "female") playerCategory = "Women";
+    if (player.isUnderdog) playerCategory = "Underdogs";
+    if (player.isLegendary) playerCategory = "Legendary";
+
+    // Check if adding the player exceeds the maximum limit
+    if (categoryCount[playerCategory] >= categoryLimits[playerCategory].max) {
+      selectedUser.Score -= 100; // Deduct 100 score points
+      await selectedUser.save(); // Save the updated score
+      return res.status(400).json({
+        message: `Cannot add more ${playerCategory} players. Maximum limit reached.`,
+      });
+    }
+
+    // Assign the player since they are within limits
     selectedUser.player_ids.push(playerId);
     selectedUser.Purse -= finalPrice;
     await selectedUser.save();
 
-    const player = await Player.findOne({ _id: playerId });
+    // Update the player's final price list
     player.finalPrice.push({ slot_num: selectedSlot, price: finalPrice });
     await player.save();
+
     return res.status(200).json({ message: "Player assigned successfully" });
   } catch (err) {
     console.log("Error:", err);

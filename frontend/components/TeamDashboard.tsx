@@ -38,10 +38,10 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ teamName, teamId }) => {
   }, [teamId, user]);
 
   const batsmen = players.filter(
-    (player) => player.type === "Batsman" || player.type === "Wicket-keeper"
+    (player) => player.type === "Batsman" || player.type === "Wicket Keeper"
   );
   const bowlers = players.filter((player) => player.type === "Bowler");
-  const allRounders = players.filter((player) => player.type === "All-rounder");
+  const allRounders = players.filter((player) => player.type === "All Rounder");
 
   const PlayerSection = ({
     title,

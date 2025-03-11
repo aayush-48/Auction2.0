@@ -87,20 +87,69 @@ export const updateUserWallet = async (req, res) => {
   }
 };
 
-export const updateScore = async (req , res ) =>{
-  const {id} = req.params;
-  const {score} = req.body
-  
-  const user = await User.findOne({_id : id})
-  if(!user){
-    res.status(404).json({msg : "user not found"});
+export const updateScore = async (req, res) => {
+  const { id } = req.params;
+  let { score } = req.body;
+
+  const user = await User.findOne({ _id: id }).populate("player_ids");
+  if (!user) {
+    return res.status(404).json({ msg: "User not found" });
   }
-  if(!score){
+
+  // Ensure score is valid
+  if (!score) {
     score = 0;
   }
 
-  user.Score = score;
+  // Categorization based on the given constraints
+  let categoryCounts = {
+    BATSMAN: 0,
+    BOWLER: 0,
+    "ALL ROUNDER": 0,
+    "WICKET KEEPER": 0,
+    FOREIGN: 0,
+    WOMEN: 0,
+    UNDERDOGS: 0,
+    LEGENDARY: 0,
+  };
+
+  user.player_ids.forEach((player) => {
+    if (player.type === "Batsman") categoryCounts.BATSMAN++;
+    if (player.type === "Bowler") categoryCounts.BOWLER++;
+    if (player.type === "All Rounder") categoryCounts["ALL ROUNDER"]++;
+    if (player.type === "Wicket Keeper") categoryCounts["WICKET KEEPER"]++;
+    if (player.country !== "India") categoryCounts.FOREIGN++;
+    if (player.gender === "female") categoryCounts.WOMEN++;
+    if (player.isUnderdog) categoryCounts.UNDERDOGS++;
+    if (player.isLegendary) categoryCounts.LEGENDARY++;
+  });
+
+  // Minimum category constraints
+  const constraints = {
+    BATSMAN: 2,
+    BOWLER: 2,
+    "ALL ROUNDER": 2,
+    "WICKET KEEPER": 1,
+    FOREIGN: 0,
+    WOMEN: 1,
+    UNDERDOGS: 1,
+    LEGENDARY: 1,
+  };
+
+  // Validate team composition
+  for (const category in constraints) {
+    if (categoryCounts[category] < constraints[category]) {
+      return res
+        .status(400)
+        .json({ msg: `Minimum requirement not met for ${category}` });
+    }
+  }
+
+  // Update user score
+  user.Score += score;
   await user.save();
 
-  res.status(200).json({msg:"Route working and score update" , newScore : user.Score })
-}
+  return res
+    .status(200)
+    .json({ msg: "Score updated successfully", newScore: user.Score });
+};
