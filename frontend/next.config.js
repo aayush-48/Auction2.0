@@ -80,7 +80,10 @@ const nextConfig = {
       },{
         protocol: "https",
         hostname: "assets-webp.khelnow.com",
-      },
+      },{
+        protocol:"https",
+        hostname : "iplcricbet.com"
+      }
     ],
   },
 };
