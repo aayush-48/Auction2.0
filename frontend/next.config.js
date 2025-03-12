@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_API_URL: "http://localhost:5001/api",
+    NEXT_PUBLIC_API_URL: "https://cron-job.org/en/api",
   },
   images: {
     remotePatterns: [
