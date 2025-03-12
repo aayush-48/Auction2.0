@@ -62,6 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ isHomePage = false }) => {
 
   const handleLogout = () => {
     // Add any logout logic here (clearing tokens, etc.)
+    localStorage.clear()
     router.push("/login")
   }
 

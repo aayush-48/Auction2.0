@@ -28,6 +28,10 @@ export default function Login() {
       localStorage.setItem("role", data.role); // Store role for redirection
       localStorage.setItem("slot" , data.slot)
 
+      if(data.score && data.score >= 0){
+        localStorage.setItem("userScore" , data.score)
+      }
+
       // Redirect based on role
       if (data.role === "admin") {
         router.push("/admin");

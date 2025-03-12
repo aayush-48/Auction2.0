@@ -15,12 +15,24 @@ export const login = async (req, res) => {
         { expiresIn: "1d" }
       );
 
-      res.json({
-        token,
-        id: user._id,
-        role: user.role,
-        slot : user.slot_num
-      });
+      if(user.Score <= 0){
+
+        res.status(200).json({
+          token,
+          id: user._id,
+          role: user.role,
+          slot : user.slot_num
+        });
+      } else {
+        
+        res.status(200).json({
+          token,
+          id: user._id,
+          role: user.role,
+          slot : user.slot_num,
+          score : user.Score
+        });
+      }
     } else {
       console.error("Login failed: Invalid credentials"); // Prints error if login fails
       res.status(401).json({ message: "Invalid credentials" });
