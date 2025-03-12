@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ChevronDown } from "lucide-react"
 import { useRouter } from "next/navigation"
 import type React from "react"
+import { useEffect, useState } from "react"
 
 // Removed DropdownMenu import
 
@@ -49,6 +50,14 @@ const IPL_TEAMS = [
 ]
 
 const Navbar: React.FC<NavbarProps> = ({ isHomePage = false }) => {
+
+  const [submitted , setSubmitted] = useState(localStorage.getItem("userScore"))
+  var redirects = ''
+  useEffect(()=>{
+    console.log("Submitted = " + submitted);
+    
+  } , [submitted])
+
   const router = useRouter()
 
   const handleLogout = () => {
@@ -72,10 +81,10 @@ const Navbar: React.FC<NavbarProps> = ({ isHomePage = false }) => {
         ) : (
           <>
             <div className="hidden md:flex space-x-4 items-center">
-              <NavLink href="/dashboard">Dashboard</NavLink>
-              <NavLink href="/search">Search</NavLink>
-              <NavLink href="/leaderboard">Leaderboard</NavLink>
-              <NavLink href="/calculator">Calculator</NavLink>
+              <NavLink href={submitted ? "/leaderboard" :"/dashboard"} setSubmitted={setSubmitted}>Dashboard</NavLink>
+              <NavLink href={submitted ? "/leaderboard" :"/search"} setSubmitted={setSubmitted}>Search</NavLink>
+              <NavLink href={submitted ? "/leaderboard" :"/leaderboard"} setSubmitted={setSubmitted}>Leaderboard</NavLink>
+              <NavLink href={submitted ? "/leaderboard" :"/calculator"} setSubmitted={setSubmitted}>Calculator</NavLink>
               <TeamDropdown />
             </div>
             <button
@@ -91,8 +100,8 @@ const Navbar: React.FC<NavbarProps> = ({ isHomePage = false }) => {
   )
 }
 
-const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <Link href={href} className="text-white hover:text-heliotrope transition-colors">
+const NavLink = ({ href, children, setSubmitted }: { href: string; children: React.ReactNode }) => (
+  <Link href={href} onClick={() => setSubmitted(localStorage.getItem("userScore"))} className="text-white hover:text-heliotrope transition-colors">
     {children}
   </Link>
 )

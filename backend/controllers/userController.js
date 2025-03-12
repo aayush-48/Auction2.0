@@ -96,6 +96,11 @@ export const updateScore = async (req, res) => {
     return res.status(404).json({ msg: "User not found" });
   }
 
+  //Ensure user does not already have a positive score
+  if (user.Score > 0){
+    return res.status(400).json({msg : "Cannot try to submit more than once!"})
+  }
+
   // Ensure score is valid
   if (!score) {
     score = 0;
