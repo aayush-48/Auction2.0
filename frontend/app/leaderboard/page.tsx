@@ -2,11 +2,22 @@
 
 import { motion } from "framer-motion"
 import { useAuction } from "../../context/AuctionContext"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function Leaderboard() {
   const { teamsOfSameSlot } = useAuction()
   const {sortedTeams} = teamsOfSameSlot
   console.log(teamsOfSameSlot);
+  const router= useRouter()
+
+  useEffect(()=>{
+    if(!localStorage.getItem("token") || !localStorage.getItem("slot") || !localStorage.getItem("id") || !localStorage.getItem("role")){
+      localStorage.clear()
+      router.push("/login")
+      return;
+    }
+  } ,[])
   
   return (
     <div className="space-y-8">

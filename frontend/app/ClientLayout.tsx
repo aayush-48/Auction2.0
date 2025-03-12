@@ -12,13 +12,13 @@ export default function ClientLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const isLoginPage = pathname === "/login"
+  const isLoginOrAdminPage = pathname === "/login" || pathname === "/admin"
 
   return (
     <AuctionProvider>
-      {!isLoginPage && <Navbar />}
+      {!isLoginOrAdminPage && <Navbar />}
       <main>{children}</main>
-      {!isLoginPage && <Footer />}
+      {!isLoginOrAdminPage && <Footer />}
     </AuctionProvider>
   )
 }

@@ -808,7 +808,11 @@ export default function Calculator() {
   };
 
   useEffect(() => {
-    console.log(localStorage.getItem("userScore") === null);
+    if(!localStorage.getItem("token") || !localStorage.getItem("slot") || !localStorage.getItem("id") || !localStorage.getItem("role")){
+      localStorage.clear()
+      router.push("/login")
+      return;
+    }
 
     if (localStorage.getItem("userScore") != null) {
       router.push("/leaderboard");

@@ -52,7 +52,7 @@ const IPL_TEAMS = [
 const Navbar: React.FC<NavbarProps> = ({ isHomePage = false }) => {
 
   const [submitted , setSubmitted] = useState(localStorage.getItem("userScore"))
-  var redirects = ''
+
   useEffect(()=>{
     console.log("Submitted = " + submitted);
     
