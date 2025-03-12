@@ -17,6 +17,7 @@ import {
   XIcon,
   BarChart3Icon,
   CheckCircleIcon,
+  ShieldIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -64,11 +65,13 @@ export default function Calculator() {
     middleOvers: Array(3).fill(null),
     deathOvers: Array(4).fill(null),
   });
+  const [captain, setCaptain] = useState(null);
   const [showScoreDetails, setShowScoreDetails] = useState(false);
   const [scoreBreakdown, setScoreBreakdown] = useState({
     baseScore: 0,
     battingBonus: 0,
     bowlingBonus: 0,
+    captaincyBonus: 0,
   });
   const [players, setPlayers] = useState([]);
   const [flag, setFlag] = useState(false);
@@ -82,7 +85,7 @@ export default function Calculator() {
     fetchPlayers();
   }, [user, flag]);
 
-  // Define the steps for the sequential flow - remove the first selection step
+  // Define the steps for the sequential flow - add the captain selection step
   const steps = [
     {
       name: "Batting Powerplay",
@@ -126,6 +129,13 @@ export default function Calculator() {
       phase: "deathOvers",
       count: 4,
     },
+    {
+      name: "Select Captain",
+      description: "Choose one player as team captain",
+      category: "captain",
+      phase: "selection",
+      count: 1,
+    },
     { name: "Results", description: "View your team's performance score" },
   ];
 
@@ -139,11 +149,18 @@ export default function Calculator() {
 
   useEffect(() => {
     recalculateTeamScore();
-  }, [battingSelection, bowlingSelection]);
+  }, [battingSelection, bowlingSelection, captain]);
 
   const handleAssignPlayer = (player, stepIndex) => {
     const currentStepData = steps[stepIndex];
     const { category, phase } = currentStepData;
+
+    // Captain selection handling
+    if (category === "captain") {
+      setCaptain(player);
+      recalculateTeamScore();
+      return true;
+    }
 
     // Type validation
     if (
@@ -234,11 +251,22 @@ export default function Calculator() {
     recalculateTeamScore();
   };
 
+  const handleRemoveCaptain = () => {
+    setCaptain(null);
+    recalculateTeamScore();
+  };
+
   const isPlayerEligibleForAssignment = (player, stepIndex) => {
     if (!player) return false;
 
     const currentStepData = steps[stepIndex];
     const { category, phase } = currentStepData;
+
+    // For captain selection, all players are eligible
+    if (category === "captain") {
+      // Check if a captain is already assigned
+      return captain === null || captain._id !== player._id;
+    }
 
     // Type validation
     if (
@@ -345,22 +373,29 @@ export default function Calculator() {
       calculateBonus(bowlingSelection.middleOvers, "bowling") +
       calculateBonus(bowlingSelection.deathOvers, "bowling");
 
+    // Calculate Captain Bonus
+    const captaincyBonus = captain ? captain.captaincyRating || 0 : 0;
+
     // Update the state
     setScoreBreakdown({
       baseScore: Math.round(newBaseScore * 100) / 100,
       battingBonus,
       bowlingBonus,
+      captaincyBonus,
     });
 
-    setTeamScore(newBaseScore + battingBonus + bowlingBonus);
+    setTeamScore(newBaseScore + battingBonus + bowlingBonus + captaincyBonus);
   };
 
   const isStepComplete = (stepIndex) => {
     const step = steps[stepIndex];
 
-    if (stepIndex === 6) {
-      // Results step (was 7, now 6)
+    if (stepIndex === 7) {
+      // Results step
       return showScoreDetails;
+    } else if (stepIndex === 6) {
+      // Captain selection step
+      return captain !== null;
     } else {
       const { category, phase } = step;
       const selections =
@@ -377,7 +412,8 @@ export default function Calculator() {
     player,
     showRemoveButton = false,
     isAssignmentStep = false,
-    isDisabled = false
+    isDisabled = false,
+    isCaptain = false
   ) => {
     if (!player) return null;
 
@@ -386,7 +422,7 @@ export default function Calculator() {
         key={player._id}
         className={`relative group transition-all ${
           isDisabled ? "opacity-50" : "hover:shadow-md"
-        }`}
+        } ${isCaptain ? "border-2 border-yellow-500" : ""}`}
       >
         {showRemoveButton && (
           <button
@@ -403,6 +439,11 @@ export default function Calculator() {
           >
             {player.type}
           </Badge>
+          {isCaptain && (
+            <Badge className="bg-yellow-500 text-black text-xs m-2 ml-0">
+              Captain
+            </Badge>
+          )}
         </div>
 
         <div className="pt-6">
@@ -421,6 +462,11 @@ export default function Calculator() {
               <Badge variant="outline" className="bg-amber-100 text-black">
                 Rating: {player.overallRating}
               </Badge>
+              {player.captaincyRating && (
+                <Badge variant="outline" className="bg-yellow-100 text-black ml-1">
+                  Captaincy: {player.captaincyRating}
+                </Badge>
+              )}
             </div>
           </CardContent>
 
@@ -431,7 +477,7 @@ export default function Calculator() {
                 className="w-full"
                 onClick={() => handleAssignPlayer(player, currentStep)}
               >
-                Assign
+                {currentStep === 6 ? "Select as Captain" : "Assign"}
               </Button>
             </CardFooter>
           )}
@@ -449,7 +495,11 @@ export default function Calculator() {
         {selections[phase].map((player, idx) => (
           <Card
             key={idx}
-            className="relative group min-h-[120px] flex items-center justify-center"
+            className={`relative group min-h-[120px] flex items-center justify-center ${
+              captain && player && captain._id === player._id
+                ? "border-2 border-yellow-500"
+                : ""
+            }`}
           >
             {player ? (
               <>
@@ -479,6 +529,11 @@ export default function Calculator() {
                   >
                     {player.type}
                   </Badge>
+                  {captain && player && captain._id === player._id && (
+                    <Badge className="bg-yellow-500 text-white text-xs mt-1 ml-1">
+                      C
+                    </Badge>
+                  )}
                 </CardContent>
               </>
             ) : (
@@ -493,11 +548,56 @@ export default function Calculator() {
     );
   };
 
+  const renderCaptainSelection = () => {
+    return (
+      <div>
+        {captain ? (
+          <Card className="relative group min-h-[150px] border-2 border-yellow-500 max-w-xs mx-auto">
+            <div className="absolute top-1 right-1">
+              <button
+                className="bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={handleRemoveCaptain}
+              >
+                <XIcon size={14} />
+              </button>
+            </div>
+            <CardContent className="text-center p-4 flex flex-col items-center">
+              <ShieldIcon className="text-yellow-500 w-8 h-8 mb-2" />
+              <img
+                src={captain.src}
+                alt={captain.name}
+                className="rounded-full w-16 h-16 mx-auto mb-2 object-cover border-2 border-yellow-500"
+              />
+              <h4 className="font-medium text-lg">{captain.name}</h4>
+              <Badge
+                className={`${getTypeColor(
+                  captain.type
+                )} text-white text-xs mt-1`}
+              >
+                {captain.type}
+              </Badge>
+              <div className="mt-2">
+                <Badge variant="outline" className="bg-yellow-100 text-black">
+                  Captaincy Rating: {captain.captaincyRating || 0}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="text-gray-400 flex flex-col items-center p-6 border rounded-lg mx-auto max-w-xs">
+            <ShieldIcon size={32} />
+            <p className="text-sm mt-2">No Captain Selected</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderStepContent = () => {
     const step = steps[currentStep];
 
-    // Step 6 (was 7): Results
-    if (currentStep === 6) {
+    // Step 7: Results
+    if (currentStep === 7) {
       return (
         <div className="space-y-6">
           <div className="flex flex-col items-center py-6">
@@ -528,6 +628,12 @@ export default function Calculator() {
                   +{scoreBreakdown.bowlingBonus}
                 </span>
               </div>
+              <div className="flex justify-between items-center">
+                <span>Captaincy Bonus:</span>
+                <span className="font-medium text-lg text-green-600">
+                  +{scoreBreakdown.captaincyBonus}
+                </span>
+              </div>
               <div className="border-t pt-3 flex justify-between font-medium text-xl">
                 <span>Total:</span>
                 <span>{Math.round(teamScore * 100) / 100}</span>
@@ -537,7 +643,7 @@ export default function Calculator() {
 
           <div className="space-y-6">
             <Tabs defaultValue="battingPowerplay">
-              <TabsList className="w-full grid grid-cols-6">
+              <TabsList className="w-full grid grid-cols-7">
                 <TabsTrigger value="battingPowerplay">
                   Batting Powerplay
                 </TabsTrigger>
@@ -548,6 +654,7 @@ export default function Calculator() {
                 </TabsTrigger>
                 <TabsTrigger value="bowlingMiddle">Bowling Middle</TabsTrigger>
                 <TabsTrigger value="bowlingDeath">Bowling Death</TabsTrigger>
+                <TabsTrigger value="captain">Captain</TabsTrigger>
               </TabsList>
 
               <TabsContent value="battingPowerplay">
@@ -573,13 +680,52 @@ export default function Calculator() {
               <TabsContent value="bowlingDeath">
                 {renderAssignedSlots("bowling", "deathOvers")}
               </TabsContent>
+
+              <TabsContent value="captain">
+                {renderCaptainSelection()}
+              </TabsContent>
             </Tabs>
           </div>
         </div>
       );
     }
 
-    // Steps 0-5: Assignment Steps (was 1-6)
+    // Step 6: Captain Selection
+    if (currentStep === 6) {
+      return (
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-medium mb-2 text-black">
+              Select Team Captain
+            </h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Choose one player to lead your team. Their captaincy rating will be added to your final team score.
+            </p>
+
+            <div className="mb-6">
+              <h3 className="text-lg font-medium mb-2">Selected Captain</h3>
+              {renderCaptainSelection()}
+            </div>
+
+            <ScrollArea className="h-96 border rounded-lg p-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {selectedPlayers.map((player) =>
+                  renderPlayerCard(
+                    player,
+                    false,
+                    true,
+                    captain && captain._id === player._id,
+                    captain && captain._id === player._id
+                  )
+                )}
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
+      );
+    }
+
+    // Steps 0-5: Assignment Steps
     const { category, phase, count } = step;
 
     return (
@@ -623,7 +769,8 @@ export default function Calculator() {
                     player,
                     false,
                     true,
-                    !isPlayerEligibleForAssignment(player, currentStep)
+                    !isPlayerEligibleForAssignment(player, currentStep),
+                    captain && captain._id === player._id
                   )
                 )}
             </div>
@@ -693,7 +840,7 @@ export default function Calculator() {
             Refresh
           </Button>
         </div>
-
+  
         <div className="p-4 bg-gray-50 border-b">
           <div className="flex overflow-x-auto">
             {steps.map((step, index) => (
@@ -716,87 +863,55 @@ export default function Calculator() {
                 </div>
                 <div className="ml-2 mr-4">
                   <div className="text-sm font-medium">{step.name}</div>
-                  <div className="text-xs text-gray-500">
-                    {step.description}
-                  </div>
+                  <div className="text-xs text-gray-500">{step.description}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-
+  
         <div className="p-6">{renderStepContent()}</div>
-
+  
         <div className="p-4 bg-gray-50 border-t flex justify-between">
           <Button
             variant="outline"
-            onClick={() => setCurrentStep((prev) => Math.max(0, prev - 1))}
+            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
             disabled={currentStep === 0}
             className="flex items-center"
           >
-            <ArrowLeftIcon size={16} className="mr-2" />
+            <ArrowLeftIcon className="mr-2" size={16} />
             Previous
           </Button>
-
-          {currentStep < 5 ? (
-            <>
-              <div className="flex gap-5">
-                <p className="text-gray-500 mt-2">Total Team Score</p>
-                <div className="text-3xl font-bold text-indigo-600">
-                  {Math.round(teamScore * 100) / 100}
-                </div>
-              </div>
-              <Button
-                onClick={() => {
-                  console.log(currentStep);
-                  setCurrentStep((prev) => prev + 1);
-                }}
-                disabled={!canProceedToNextStep()}
-                className="bg-indigo-600 hover:bg-indigo-700 flex items-center"
-              >
-                Next
-                <ArrowRightIcon size={16} className="ml-2" />
-              </Button>
-            </>
-          ) : currentStep === 5 ? (
-            <>
-              <div className="flex gap-5">
-                <p className="text-gray-500 mt-2">Total Team Score</p>
-                <div className="text-3xl font-bold text-indigo-600">
-                  {Math.round(teamScore * 100) / 100}
-                </div>
-              </div>
-              <Button
-                onClick={() => setCurrentStep(6)}
-                disabled={!canProceedToNextStep()}
-                className="bg-indigo-600 hover:bg-indigo-700"
-              >
-                Calculate Team Score
-                <BarChart3Icon size={16} className="ml-2" />
-              </Button>
-            </>
+  
+          {currentStep < steps.length - 1 ? (
+            <Button
+              onClick={() => setCurrentStep(currentStep + 1)}
+              disabled={!canProceedToNextStep()}
+              className="flex items-center"
+            >
+              Next
+              <ArrowRightIcon className="ml-2" size={16} />
+            </Button>
           ) : (
-            //put submit
-            <>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
-                  <DialogTitle>Alert</DialogTitle>
-                  <DialogDescription>
-                    {errorMsg}, you are now disqualified and cannot submit.
-                  </DialogDescription>
-                </DialogContent>
-              </Dialog>
-              <Button
-                className="bg-indigo-600 hover:bg-indigo-700"
-                variant="outline"
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
-            </>
+            <Button 
+              onClick={handleSubmit}
+              className="bg-green-600 hover:bg-green-700 flex items-center"
+            >
+              Submit Score
+              <BarChart3Icon className="ml-2" size={16} />
+            </Button>
           )}
         </div>
       </motion.div>
+  
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-red-500">Error</DialogTitle>
+            <DialogDescription>{errorMsg}</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-}
+}  
