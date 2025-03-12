@@ -13,7 +13,7 @@ export const getTeams = async (req, res) => {
 
 export const getTeamById = async (req, res) => {
   try {
-    const team = await Team.findById(req.params.id);
+    const team = await Team.findOne({ _id: req.params.id });
     if (team) {
       res.json(team);
     } else {
@@ -93,22 +93,21 @@ export const assignTeam = async (req, res) => {
   }
 };
 
+export const getTeamsOfSlot = async (req, res) => {
+  const { slot: slot_num } = req.params;
 
-export const getTeamsOfSlot = async(req , res) =>{
-  const {slot : slot_num} = req.params
-
-  const users = await User.find({slot_num , role : "player"})
-  const teams = await Team.find()
+  const users = await User.find({ slot_num, role: "player" });
+  const teams = await Team.find();
   // console.log(teams);
 
-  if(!teams || teams.length === 0){
-    return res.status(404).json({msg : "No teams"})
+  if (!teams || teams.length === 0) {
+    return res.status(404).json({ msg: "No teams" });
   }
-  if(!users || users.length === 0){
-    return res.status(404).json({msg : "Players not found."})
+  if (!users || users.length === 0) {
+    return res.status(404).json({ msg: "Players not found." });
   }
-  
-  const teamWiseScore = {}
+
+  const teamWiseScore = {};
 
   teams.forEach((team) => {
     teamWiseScore[team.name] = 0;
@@ -116,19 +115,18 @@ export const getTeamsOfSlot = async(req , res) =>{
 
   // Accumulate scores for each team
   users.forEach((user) => {
-    const team = teams.find((team) => team._id.equals(user.ipl_team_id));
+    const team = teams.find((team) => team._id == user.ipl_team_id);
     if (team) {
       teamWiseScore[team.name] += user.Score || 0; // Add user's score to the team
     }
   });
 
   const sortedTeams = Object.entries(teamWiseScore)
-      .map(([teamName, score]) => ({ teamName, score }))
-      .sort((a, b) => b.score - a.score); 
-  
+    .map(([teamName, score]) => ({ teamName, score }))
+    .sort((a, b) => b.score - a.score);
 
-  res.status(200).json({msg : "Route is working" , sortedTeams })
-}
+  res.status(200).json({ msg: "Route is working", sortedTeams });
+};
 export const getPlayersByTeam = async (req, res) => {
   try {
     const teamId = req.params.id;
@@ -149,6 +147,26 @@ export const getPlayersByTeam = async (req, res) => {
 
     res.json(players);
   } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getTeamPurse = async (req, res) => {
+  try {
+    const teamId = req.params.id;
+    const { slot } = req.query;
+    const team = await Team.findOne({ teamId: teamId });
+    if (!team) return res.status(404).json({ message: "Team not found" });
+    const user = await User.findOne({
+      ipl_team_id: team._id.toString(),
+      slot_num: slot,
+    });
+    res.status(200).json({ purseValue: user.Purse });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+  } catch (e) {
+    console.error(e);
     res.status(500).json({ message: "Internal server error" });
   }
 };

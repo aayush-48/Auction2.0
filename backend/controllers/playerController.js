@@ -104,6 +104,9 @@ export const assignPlayer = async (req, res) => {
         .status(400)
         .json({ message: "Could not find user for assignment." });
     }
+    if (finalPrice > selectedUser.Purse) {
+      return res.status(400).json({ message: "Purse value too low" });
+    }
 
     // Ensure player_ids exists and is an array
     if (!Array.isArray(selectedUser.player_ids)) {
@@ -218,11 +221,11 @@ export const unassignPlayer = async (req, res) => {
       ipl_team_id: selectedTeam,
       slot_num: selectedSlot,
     });
+
     if (!selectedUser) {
       return res.status(400).json({ message: "Could not find assigned user." });
     }
 
-    // Ensure player_ids exists and is an array
     if (!Array.isArray(selectedUser.player_ids)) {
       return res
         .status(400)
@@ -235,22 +238,40 @@ export const unassignPlayer = async (req, res) => {
         .status(400)
         .json({ message: "Player is not assigned to this user." });
     }
-    // Remove the player ID
+
+    // Retrieve the player's final price for this slot
+    const player = await Player.findOne({ _id: playerId });
+    if (!player) {
+      return res.status(400).json({ message: "Player not found." });
+    }
+
+    // Find the price for the selected slot
+    const slotPriceEntry = player.finalPrice.find(
+      (entry) => entry.slot_num === selectedSlot
+    );
+
+    if (slotPriceEntry) {
+      // Refund the amount to the user's balance
+      selectedUser.balance += slotPriceEntry.price; // Assuming 'price' stores the final price
+
+      // Remove the price entry from player's finalPrice
+      player.finalPrice = player.finalPrice.filter(
+        (entry) => entry.slot_num !== selectedSlot
+      );
+    }
+
+    // Remove the player ID from the user's assigned players
     selectedUser.player_ids = selectedUser.player_ids.filter(
       (id) => id.toString() !== playerId
     );
 
+    // Save updated user and player data
     await selectedUser.save();
+    await player.save();
 
-    // Update player's finalPrice history
-    const player = await Player.findOne({ _id: playerId });
-    if (player) {
-      player.finalPrice = player.finalPrice.filter(
-        (entry) => entry.slot_num !== selectedSlot
-      );
-      await player.save();
-    }
-    return res.status(200).json({ message: "Player unassigned successfully" });
+    return res
+      .status(200)
+      .json({ message: "Player unassigned and refund processed successfully" });
   } catch (err) {
     console.log("Error:", err);
     res.status(500).json({ message: "Server error" });

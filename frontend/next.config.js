@@ -6,6 +6,8 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      { protocol: "https", hostname: "s.yimg.com" },
+      { protocol: "https", hostname: "e0.pxfuel.com" },
       {
         protocol: "https",
         hostname: "iplcricbet.com",
@@ -89,10 +91,11 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "assets-webp.khelnow.com",
-      },{
-        protocol:"https",
-        hostname : "iplcricbet.com"
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "iplcricbet.com",
+      },
     ],
   },
 };

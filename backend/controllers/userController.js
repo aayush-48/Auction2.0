@@ -87,6 +87,20 @@ export const updateUserWallet = async (req, res) => {
   }
 };
 
+export const fetchUserWallet = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      res.status(200).json({ purseValue: user.Purse });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(400).json({ message: "Invalid User data" });
+  }
+};
+
 export const updateScore = async (req, res) => {
   const { id } = req.params;
   let { score } = req.body;
@@ -97,8 +111,10 @@ export const updateScore = async (req, res) => {
   }
 
   //Ensure user does not already have a positive score
-  if (user.Score > 0){
-    return res.status(400).json({msg : "Cannot try to submit more than once!"})
+  if (user.Score > 0) {
+    return res
+      .status(400)
+      .json({ msg: "Cannot try to submit more than once!" });
   }
 
   // Ensure score is valid

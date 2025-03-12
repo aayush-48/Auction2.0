@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ChevronDown } from "lucide-react"
-import { useRouter } from "next/navigation"
-import type React from "react"
-import { useEffect, useState } from "react"
+import Link from "next/link";
+import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useEffect, useState } from "react";
 
 // Removed DropdownMenu import
 
@@ -15,7 +15,12 @@ const TeamDropdown = () => {
         Teams <ChevronDown className="inline-block ml-1" size={16} />
       </button>
       <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-russian-violet-2 ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out">
-        <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+        <div
+          className="py-1"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="options-menu"
+        >
           {IPL_TEAMS.map((team) => (
             <Link
               key={team.id}
@@ -29,11 +34,11 @@ const TeamDropdown = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 interface NavbarProps {
-  isHomePage?: boolean
+  isHomePage?: boolean;
 }
 
 const IPL_TEAMS = [
@@ -47,23 +52,20 @@ const IPL_TEAMS = [
   { id: "rcb", name: "Royal Challengers Bangalore", path: "/team/rcb" },
   { id: "rr", name: "Rajasthan Royals", path: "/team/rr" },
   { id: "srh", name: "Sunrisers Hyderabad", path: "/team/srh" },
-]
+];
 
 const Navbar: React.FC<NavbarProps> = ({ isHomePage = false }) => {
+  const [submitted, setSubmitted] = useState();
+  useEffect(() => {
+    setSubmitted(localStorage.getItem("userScore"));
+  }, []);
 
-  const [submitted , setSubmitted] = useState(localStorage.getItem("userScore"))
-  var redirects = ''
-  useEffect(()=>{
-    console.log("Submitted = " + submitted);
-    
-  } , [submitted])
-
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogout = () => {
     // Add any logout logic here (clearing tokens, etc.)
-    router.push("/login")
-  }
+    router.push("/login");
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-russian-violet-2 bg-opacity-80 backdrop-filter backdrop-blur-lg">
@@ -81,10 +83,30 @@ const Navbar: React.FC<NavbarProps> = ({ isHomePage = false }) => {
         ) : (
           <>
             <div className="hidden md:flex space-x-4 items-center">
-              <NavLink href={submitted ? "/leaderboard" :"/dashboard"} setSubmitted={setSubmitted}>Dashboard</NavLink>
-              <NavLink href={submitted ? "/leaderboard" :"/search"} setSubmitted={setSubmitted}>Search</NavLink>
-              <NavLink href={submitted ? "/leaderboard" :"/leaderboard"} setSubmitted={setSubmitted}>Leaderboard</NavLink>
-              <NavLink href={submitted ? "/leaderboard" :"/calculator"} setSubmitted={setSubmitted}>Calculator</NavLink>
+              <NavLink
+                href={submitted ? "/leaderboard" : "/dashboard"}
+                setSubmitted={setSubmitted}
+              >
+                Dashboard
+              </NavLink>
+              <NavLink
+                href={submitted ? "/leaderboard" : "/search"}
+                setSubmitted={setSubmitted}
+              >
+                Search
+              </NavLink>
+              <NavLink
+                href={submitted ? "/leaderboard" : "/leaderboard"}
+                setSubmitted={setSubmitted}
+              >
+                Leaderboard
+              </NavLink>
+              <NavLink
+                href={submitted ? "/leaderboard" : "/calculator"}
+                setSubmitted={setSubmitted}
+              >
+                Calculator
+              </NavLink>
               <TeamDropdown />
             </div>
             <button
@@ -97,14 +119,24 @@ const Navbar: React.FC<NavbarProps> = ({ isHomePage = false }) => {
         )}
       </div>
     </nav>
-  )
-}
+  );
+};
 
-const NavLink = ({ href, children, setSubmitted }: { href: string; children: React.ReactNode }) => (
-  <Link href={href} onClick={() => setSubmitted(localStorage.getItem("userScore"))} className="text-white hover:text-heliotrope transition-colors">
+const NavLink = ({
+  href,
+  children,
+  setSubmitted,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) => (
+  <Link
+    href={href}
+    onClick={() => setSubmitted(localStorage.getItem("userScore"))}
+    className="text-white hover:text-heliotrope transition-colors"
+  >
     {children}
   </Link>
-)
+);
 
-export default Navbar
-
+export default Navbar;

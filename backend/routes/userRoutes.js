@@ -7,6 +7,7 @@ import {
   deleteUser,
   updateUserWallet,
   updateScore,
+  fetchUserWallet,
 } from "../controllers/userController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 import { login } from "../controllers/authController.js";
@@ -20,9 +21,9 @@ router
   .delete(protect, admin, deleteUser);
 
 router.route("/updateWallet/:id").post(protect, admin, updateUserWallet);
-
+router.route("/purse/:id").get(fetchUserWallet);
 router.route("/login").post(login);
 
-router.route("/score/:id").post(updateScore)
+router.route("/score/:id").post(updateScore);
 
 export default router;

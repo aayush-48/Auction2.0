@@ -23,10 +23,10 @@ const AssignPlayer = () => {
   const router = useRouter();
   const fetchData = async () => {
     try {
-      var playersRes = await getPlayers();
+      const playersRes = await getPlayers();
       // playersRes= playersRes.data.sort()
       console.log(playersRes.data.sort((a, b) => a.name.localeCompare(b.name)));
-      
+
       const teamsRes = await getTeams();
       setPlayers(playersRes.data);
       setTeams(teamsRes.data);

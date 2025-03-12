@@ -5,9 +5,8 @@ import { motion } from "framer-motion";
 import PlayerCard from "./PlayerCard";
 import type React from "react";
 import { GiCricketBat, GiBowlingPin, GiAlliedStar } from "react-icons/gi";
-import { getPlayersByTeam } from "../app/api/api";
+import { getPlayersByTeam, fetchTeamPurse } from "../app/api/api";
 import { useAuction, type Player } from "../context/AuctionContext";
-
 interface TeamDashboardProps {
   teamName: string;
   teamId: string;
@@ -17,24 +16,32 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ teamName, teamId }) => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [purse, setPurse] = useState<number | null>(null);
   const { user } = useAuction();
+
   useEffect(() => {
-    const fetchPlayers = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         if (user) {
-          const response = await getPlayersByTeam(teamId, user.slot_num);
-          setPlayers(response.data);
+          // Fetch players
+          const playersResponse = await getPlayersByTeam(teamId, user.slot_num);
+          setPlayers(playersResponse.data);
+
+          // Fetch team purse
+          const purseResponse = await fetchTeamPurse(teamId, user.slot_num);
+          console.log(purseResponse.data);
+          setPurse(purseResponse.data.purseValue);
         }
       } catch (error) {
-        console.error("Error fetching players:", error);
-        setError("Failed to fetch players. Please try again later.");
+        console.error("Error fetching data:", error);
+        setError("Failed to fetch data. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPlayers();
+    fetchData();
   }, [teamId, user]);
 
   const batsmen = players.filter(
@@ -61,6 +68,7 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ teamName, teamId }) => {
         {players.map((player) => (
           <PlayerCard
             key={player.id}
+            slot_num={user.slot_num}
             {...player}
             rtmTeam={
               player.rtmTeam as
@@ -105,6 +113,10 @@ const TeamDashboard: React.FC<TeamDashboardProps> = ({ teamName, teamId }) => {
           <div>
             <p className="text-sm text-gray-400">Total Players</p>
             <p className="text-3xl font-bold text-white">{players.length}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-400">Total Purse</p>
+            <p className="text-3xl font-bold text-white">{purse} Cr</p>
           </div>
           {/* <div>
             <p className="text-sm text-gray-400">Team Value</p>

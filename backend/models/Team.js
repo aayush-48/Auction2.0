@@ -1,12 +1,12 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const teamSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
   name: { type: String, required: true },
   // score: { type: Number, required: true },
   // players: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
-  img : {type : String },
-  teamId : {type : String , required : true}
-})
+  img: { type: String },
+  teamId: { type: String, required: true },
+});
 
-export default mongoose.model("Team", teamSchema)
-
+export default mongoose.model("Team", teamSchema);

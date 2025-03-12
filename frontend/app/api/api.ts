@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
@@ -56,6 +57,8 @@ export const assignTeam = (id: string, teamData: any) =>
   api.post(`/teams/assign/${id}`, teamData);
 export const getPlayersByTeam = (id: string, slot: number) =>
   api.get(`/teams/players/${id}`, { params: { slot: slot } });
+export const fetchTeamPurse = (id: string, slot: number) =>
+  api.get(`/teams/purse/${id}`, { params: { slot: slot } });
 
 export const getPowerCards = () => api.get("/powerCards");
 export const createPowerCard = (powerCardData: any) =>
@@ -70,12 +73,16 @@ export const updateUserPurse = (id: string, userData: any) =>
   api.post(`/users/updateWallet/${id}`, userData);
 export const getAnalytics = () => api.get("/analytics");
 
-export const setUserScore = (id : string , score: number=0) => api.post(`/users/score/${id}`,{
-  score : score
-})  
+export const setUserScore = (id: string, score: number = 0) =>
+  api.post(`/users/score/${id}`, {
+    score: score,
+  });
 
-export const getOtherTeamsFromSameSlot = (slot : String | Number) => {
-  return api.get(`/teams/slot/${slot}`)
-}
+export const getOtherTeamsFromSameSlot = (slot: string | number) => {
+  return api.get(`/teams/slot/${slot}`);
+};
 
+export const getUserPurse = (id: string) => {
+  return api.get(`/users/purse/${id}`);
+};
 export default api;

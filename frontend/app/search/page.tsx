@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Search() {
-  const { players } = useAuction();
+  const { players, user } = useAuction();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     role: "",
@@ -68,23 +68,6 @@ export default function Search() {
             <option value="All Rounder">All-rounder</option>
             <option value="Wicket Keeper">Wicket-keeper</option>
           </select>
-          <select
-            value={filters.team}
-            onChange={(e) => setFilters({ ...filters, team: e.target.value })}
-            className="bg-russian-violet bg-opacity-50 text-white rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amethyst"
-          >
-            <option value="">All Teams</option>
-            <option value="MI">Mumbai Indians</option>
-            <option value="CSK">Chennai Super Kings</option>
-            <option value="RCB">Royal Challengers Bangalore</option>
-            <option value="KKR">Kolkata Knight Riders</option>
-            <option value="DC">Delhi Capitals</option>
-            <option value="PBKS">Punjab Kings</option>
-            <option value="RR">Rajasthan Royals</option>
-            <option value="SRH">Sunrisers Hyderabad</option>
-            <option value="GT">Gujarat Titans</option>
-            <option value="LSG">Lucknow Super Giants</option>
-          </select>
         </div>
       </motion.div>
 
@@ -92,6 +75,7 @@ export default function Search() {
         {filteredPlayers.map((player) => (
           <PlayerCard
             key={player.id}
+            slot_num={user.slot_num}
             {...player}
             rtmTeam={
               player.rtmTeam as

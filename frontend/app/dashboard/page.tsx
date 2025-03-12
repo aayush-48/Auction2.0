@@ -12,18 +12,26 @@ import {
 } from "react-icons/gi";
 import type React from "react";
 import { Spinner } from "@/components/ui/spinner";
-import { getPlayersByUser } from "../api/api";
+import { getPlayersByUser, getTeamById, getUserPurse } from "../api/api"; // Assuming this function exists
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 const fetchUserPlayers = async (id: string) => {
   const response = await getPlayersByUser(id);
   return response.data;
 };
 
+const fetchPurse = async (id: string) => {
+  const response = await getUserPurse(id); // API call to fetch purse value
+  return response.data.purseValue;
+};
+
 export default function Dashboard() {
-  const { loading, error, user } = useAuction();
+  const { user } = useAuction();
   const [players, setPlayers] = useState([]);
   const [flag, setFlag] = useState(false);
+  const [purse, setPurse] = useState(0); // Initialized purse state
+  const [team, setTeam] = useState({});
   useEffect(() => {
     const fetchPlayers = async () => {
       if (user) {
@@ -31,16 +39,30 @@ export default function Dashboard() {
         setPlayers(fetchedPlayers);
       }
     };
-    fetchPlayers();
-  }, [user, flag]);
-  const router = useRouter();
-  useEffect(() =>{
-      console.log(localStorage.getItem("userScore") === null);
-      
-      if( localStorage.getItem("userScore") != null ){
-        router.push("/leaderboard")
+    const fetchUserPurseValue = async () => {
+      if (user) {
+        const fetchedPurse = await fetchPurse(user._id);
+        setPurse(fetchedPurse);
       }
-  } , [])
+    };
+    const fetchUserTeam = async () => {
+      if (user) {
+        const fetchedTeam = await getTeamById(user.ipl_team_id);
+        setTeam(fetchedTeam.data);
+      }
+    };
+
+    fetchPlayers();
+    fetchUserPurseValue(); // Fetch purse when component mounts or refresh button is clicked
+    fetchUserTeam();
+  }, [user, flag]);
+
+  const router = useRouter();
+  useEffect(() => {
+    if (localStorage.getItem("userScore") != null) {
+      router.push("/leaderboard");
+    }
+  }, []);
 
   if (!user) {
     return (
@@ -59,16 +81,14 @@ export default function Dashboard() {
   const bowlers = players.filter((player) => player.type === "Bowler");
   const allRounders = players.filter((player) => player.type === "All Rounder");
 
-  // Mock data for purse and powercards (replace with actual data from your context)
-  const totalPurse = user.Purse;
   const teamValue = players.reduce((sum, player) => {
-    // console.log(user);
     const slotPrice =
       player.finalPrice.find((slot) => Number(slot.slot_num) === slot_num)
         ?.price || 0;
     return sum + Number(slotPrice);
   }, 0);
-  const remainingPurse = Math.max(0, totalPurse - teamValue); // Ensure remaining purse is not negative
+
+  const remainingPurse = Math.max(0, purse - teamValue); // Ensure remaining purse is not negative
   const totalPowercards = 5;
   const usedPowercards = 2;
 
@@ -113,20 +133,6 @@ export default function Dashboard() {
     </div>
   );
 
-  const formatPrice = (price: number) => {
-    return price >= 10000000
-      ? `${(price / 10000000).toFixed(2)} Cr`
-      : `${(price / 100000).toFixed(2)} Lakh`;
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
     <div className="space-y-8">
       <motion.div
@@ -149,8 +155,14 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-sm text-gray-400">Total Purse</p>
-            <p className="text-3xl font-bold text-white">{totalPurse} Cr</p>
+            <p className="text-3xl font-bold text-white">{purse} Cr</p>
           </div>
+          <Image
+            src={team ? team.img : null}
+            width={150}
+            height={100}
+            alt={team.name || "team-logo"}
+          ></Image>
         </div>
       </motion.div>
       <div className="min-w-full flex justify-between">

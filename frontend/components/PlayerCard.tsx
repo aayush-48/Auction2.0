@@ -55,7 +55,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   rtmTeam,
   isElite,
   src,
-  overallRating
+  overallRating,
 }) => {
   const finalPriceNum =
     finalPrice.find((slot) => Number(slot.slot_num) === slot_num)?.price || 0;
