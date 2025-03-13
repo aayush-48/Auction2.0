@@ -99,6 +99,12 @@ export const assignPlayer = async (req, res) => {
       slot_num: selectedSlot,
     });
 
+    if(selectedUser.player_ids.length >= 11){
+      return res
+        .status(400)
+        .json({ message: "Cannot have more than 11 players re baba..." });
+    }
+
     if (!selectedUser) {
       return res
         .status(400)
