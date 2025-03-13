@@ -8,7 +8,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_API_URL: "https://cron-job.org/en/api",
+    NEXT_PUBLIC_API_URL: "https://aution2-0.onrender.com",
   },
   images: {
     remotePatterns: [
