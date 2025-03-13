@@ -2,7 +2,7 @@
 
 import type React from "react";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "../api/api";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,10 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    localStorage.clear()
+  },[])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
