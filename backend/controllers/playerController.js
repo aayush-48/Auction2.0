@@ -98,7 +98,8 @@ export const assignPlayer = async (req, res) => {
       ipl_team_id: selectedTeam,
       slot_num: selectedSlot,
     });
-
+    //console.log(selectedUser.player_ids.length >= 11);
+    
     if(selectedUser.player_ids.length >= 11){
       return res
         .status(400)
@@ -174,7 +175,7 @@ export const assignPlayer = async (req, res) => {
       player.type === "All Rounder" ||
       player.type === "Wicket Keeper"
     ) {
-      console.log(categoryCount);
+      // console.log(categoryCount);
       if (categoryCount[player.type] >= categoryLimits[player.type].max) {
         selectedUser.Score -= 100; // Deduct 100 score points
         await selectedUser.save();
@@ -199,6 +200,19 @@ export const assignPlayer = async (req, res) => {
         message: `Cannot add more ${playerCategory} players. Maximum limit reached.`,
       });
     }
+
+    // Check if the player has already been sold in the same slot
+    const alreadySold = player.finalPrice.some(
+      (entry) => entry.slot_num.toString() === selectedSlot.toString()
+    );
+    console.log(`alreadySold : ${alreadySold}`);
+    
+    if (alreadySold) {
+      console.log("Hagg diya hehe");
+      
+      return res.status(400).json({ msg: "Player already sold in this slot" });
+    }
+
 
     // Assign the player since they are within limits
     selectedUser.player_ids.push(playerId);
