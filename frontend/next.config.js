@@ -8,7 +8,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_API_URL: "https://aution2-0.onrender.com",
+    NEXT_PUBLIC_API_URL: "https://aution2-0.onrender.com/api",
   },
   images: {
     remotePatterns: [
