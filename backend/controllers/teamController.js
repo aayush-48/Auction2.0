@@ -69,8 +69,24 @@ export const deleteTeam = async (req, res) => {
 
 export const assignTeam = async (req, res) => {
   try {
-    const { userId, finalPrice } = req.body;
+    const { userId, finalPrice, slot_num } = req.body;
     const teamId = req.params.id;
+    
+    console.log(teamId , slot_num);
+    
+
+    const otherTeamsWithSameIdInSameSlot = await User.find({
+      ipl_team_id : teamId,
+      slot_num 
+    })
+
+    // console.log(otherTeamsWithSameIdInSameSlot);
+
+    if(otherTeamsWithSameIdInSameSlot.length != 0){
+      return res.status(400).json({
+        msg : "Other users in same slot with same team_id"
+      })
+    }
 
     // Find the user for assignment
     const selectedUser = await User.findOne({ _id: userId });

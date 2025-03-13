@@ -52,6 +52,7 @@ const AssignTeam = () => {
       const response = await assignTeam(selectedTeam, {
         userId: selectedUser,
         finalPrice,
+        slot_num : selectedSlot
       });
       fetchData();
       return response.status;
