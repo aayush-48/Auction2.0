@@ -157,7 +157,7 @@ export default function Dashboard() {
           Refresh
         </Button>
       </div>
-      <div className="flex flex-col m-10">git
+      <div className="flex flex-col m-10">
         <PlayerSection title="Batsmen" players={batsmen} icon={<GiCricketBat className="w-6 h-6" />} />
         <PlayerSection title="Bowlers" players={bowlers} icon={<GiBowlingPin className="w-6 h-6" />} />
         <PlayerSection title="All-rounders" players={allRounders} icon={<GiAlliedStar className="w-6 h-6" />} />
