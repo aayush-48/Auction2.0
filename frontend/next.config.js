@@ -21,6 +21,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "static.indiatv.in",
+      },
+      {
+        protocol: "https",
         hostname: "www.vhv.rs",
       },
       {
