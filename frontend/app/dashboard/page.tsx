@@ -169,7 +169,7 @@ export default function Dashboard() {
             <p className="text-3xl font-bold text-white">{purse} Cr</p>
           </div>
           <Image
-            src={team ? team.img : null}
+            src={team ? team.img : ""}
             width={150}
             height={100}
             alt={team.name || "team-logo"}

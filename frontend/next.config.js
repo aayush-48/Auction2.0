@@ -103,6 +103,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "iplcricbet.com",
       },
+      {
+        protocol : "https",
+        hostname : "tse2.mm.bing.net"
+      }
     ],
   },
 };
