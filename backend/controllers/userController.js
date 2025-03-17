@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import PowerCard from "../models/PowerCard.js";
 import cookie from "cookie";
 
 export const getUsers = async (req, res) => {
@@ -28,8 +29,17 @@ export const getUserById = async (req, res) => {
 export const createUser = async (req, res) => {
   try {
     const user = new User(req.body);
-    const createdUser = await user.save();
-    res.status(201).json(createdUser);
+    console.log(user);
+    const powerCard = await PowerCard.findOne({name : "RTM"})
+    powerCard.assignedTo.push({
+      slot : req.body.solt_num,
+      user : user._id,
+      cost : 0,
+      used : false
+    })
+    powerCard.save()
+    user.save();
+    res.status(201).json(user);
   } catch (error) {
     console.error("Error:", error);
     res.status(400).json({ message: "Invalid User data" });

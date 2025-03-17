@@ -6,7 +6,10 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   player_ids: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
   slot_num: { type: Number, enum: [1, 2, 3, 4, 5, 6], required: true },
-  power_card_id: [{ type: mongoose.Schema.Types.ObjectId, ref: "PowerCard" }],
+  power_card_id: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "PowerCard" }],
+    default: [new mongoose.Types.ObjectId("67d81ffddda0691155119e20")], // Default value
+  },
   Purse: { type: Number, required: true },
   Score: { type: Number, default: 0 },
   role: { type: String, required: true },

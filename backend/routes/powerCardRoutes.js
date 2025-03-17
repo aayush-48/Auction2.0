@@ -4,6 +4,8 @@ import {
   createPowerCard,
   updatePowerCard,
   deletePowerCard,
+  assignPowerCard,
+  usedPowerCard,
 } from "../controllers/powerCardController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 
@@ -15,5 +17,7 @@ router
   .route("/:id")
   .put(protect, admin, updatePowerCard)
   .delete(protect, admin, deletePowerCard);
+
+  router.route("/assign/:id").post(assignPowerCard).patch(usedPowerCard)
 
 export default router;
