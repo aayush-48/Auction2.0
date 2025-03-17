@@ -70,6 +70,10 @@ export const assignPowerCard = async(req , res) =>{
   if(!powercard){
     return res.status(404).json({msg : "Powercard not found..."})
   }
+
+  if(powercard.name === "RTM"){
+    return res.status(400).json({msg : "Cannot assign RTM more than once to any team. Every team shall have RTM powercard only once and that is provided by default..."})
+  }
   
   const userAlreadyContainsSameCard = powercard.assignedTo.reduce((accumulator , curr) => {
     return (curr.slot == selectedSlot && curr.user.equals(user._id)) || accumulator
