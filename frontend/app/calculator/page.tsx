@@ -917,5 +917,6 @@ export default function Calculator() {
         </DialogContent>
       </Dialog>
     </div>
+    
   );
 }  

@@ -1,7 +1,7 @@
 "use client"
 
 import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
+//import Footer from "../components/Footer"
 import { AuctionProvider } from "../context/AuctionContext"
 import type React from "react"
 import { usePathname } from "next/navigation"
@@ -18,7 +18,7 @@ export default function ClientLayout({
     <AuctionProvider>
       {!isLoginOrAdminPage && <Navbar />}
       <main>{children}</main>
-      {!isLoginOrAdminPage && <Footer />}
+      {!isLoginOrAdminPage }
     </AuctionProvider>
   )
 }
