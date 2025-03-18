@@ -1,12 +1,12 @@
 "use client";
 
 import type React from "react";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "../api/api";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,8 +15,8 @@ export default function Login() {
   const router = useRouter();
 
   useEffect(() => {
-    localStorage.clear()
-  },[])
+    localStorage.clear();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,15 +25,15 @@ export default function Login() {
       setLoading(true);
       const { data } = await login(username, password);
       console.log(data);
-      
+
       // Save token to localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("id", data.id);
-      localStorage.setItem("role", data.role); // Store role for redirection
-      localStorage.setItem("slot" , data.slot)
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("slot", data.slot);
 
-      if(data.score && data.score >= 0){
-        localStorage.setItem("userScore" , data.score)
+      if (data.score && data.score >= 0) {
+        localStorage.setItem("userScore", data.score);
       }
 
       // Redirect based on role
@@ -49,8 +49,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-russian-violet to-tekhelet">
-      <div className="bg-french-violet bg-opacity-30 p-8 rounded-lg shadow-lg w-96">
+    <div className="min-h-screen flex items-center justify-center bg-[url('/images/ipl_bg.jpeg')] bg-cover bg-center bg-no-repeat">
+      <div className="bg-french-violet bg-opacity-30 p-8 rounded-lg shadow-lg w-96 backdrop-blur-md">
         <h1 className="text-3xl font-bold mb-6 text-center text-heliotrope">
           Login
         </h1>
@@ -85,9 +85,9 @@ export default function Login() {
           <Button
             disabled={loading}
             type="submit"
-            className="w-full bg-amethyst hover:bg-heliotrope text-white font-bold py-2 px-4 rounded transition-colors duration-300"
+            className="w-full bg-amethyst hover:bg-heliotrope text-white font-bold py-2 px-4 rounded transition-colors duration-300 flex items-center justify-center"
           >
-            {loading ? <Loader2 className="animate-spin" /> : ""}
+            {loading ? <Loader2 className="animate-spin mr-2" /> : ""}
             Login
           </Button>
         </form>

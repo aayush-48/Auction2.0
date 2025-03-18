@@ -1,4 +1,5 @@
 import PowerCard from "../models/PowerCard.js";
+import User from "../models/User.js";
 
 export const getPowerCards = async (req, res) => {
   try {
@@ -56,3 +57,92 @@ export const deletePowerCard = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const assignPowerCard = async(req , res) =>{
+  const { selectedTeam, selectedSlot, finalPrice } = req.body;
+  const cardId = req.params.id
+  // console.log(cardId , selectedTeam , selectedSlot , finalPrice);
+  const user = await User.findOne({slot_num : selectedSlot , ipl_team_id : selectedTeam});
+  if(!user){
+    return res.status(404).json({msg : "User not found..."})
+  }
+  const powercard = await PowerCard.findOne({_id : cardId})
+  if(!powercard){
+    return res.status(404).json({msg : "Powercard not found..."})
+  }
+
+  if(powercard.name === "RTM"){
+    return res.status(400).json({msg : "Cannot assign RTM more than once to any team. Every team shall have RTM powercard only once and that is provided by default..."})
+  }
+  
+  const userAlreadyContainsSameCard = powercard.assignedTo.reduce((accumulator , curr) => {
+    return (curr.slot == selectedSlot && curr.user.equals(user._id)) || accumulator
+  } , false)
+  // console.log(userAlreadyContainsSameCard);
+  
+  if(userAlreadyContainsSameCard){
+    return res.status(400).json({msg : "User already contains the card"})
+  }
+
+  if(user.Purse < finalPrice){
+    return res.status(400).json({msg : "Insufficient balance in wallet"})
+  }
+
+  powercard.assignedTo.push({
+    slot : selectedSlot,
+    user : user._id,
+    cost : finalPrice,
+    used : false
+  })
+  powercard.save()
+
+  user.Purse -= finalPrice
+  user.power_card_id.push(cardId)
+  user.save()
+
+  return res.status(200).json({msg:"route is working"})
+}
+
+export const usedPowerCard= async(req , res) => {
+  const { selectedTeam, selectedSlot } = req.body;
+  const cardId = req.params.id
+  
+  // console.log(selectedSlot  , selectedTeam , cardId);
+
+  const user = await User.findOne({slot_num : selectedSlot , ipl_team_id : selectedTeam});
+  if(!user){
+    return res.status(404).json({msg : "User not found..."})
+  }
+
+  const powercard = await PowerCard.findOne({_id : cardId})
+  if(!powercard){
+    return res.status(404).json({msg : "Powercard not found..."})
+  }
+
+  const ifTeamContainsPowercard = powercard.assignedTo.reduce((accumulator , curr) =>{
+    return accumulator || curr.user.equals(user._id)
+  } , false)
+
+  if(!ifTeamContainsPowercard){
+    return res.status(400).json({msg : "Team does not contain the powercard"})
+  }
+
+  const ifAlreadyUsed = powercard.assignedTo.reduce((accumulator , curr) =>{
+    return accumulator || (selectedSlot == curr.slot && curr.user.equals(user._id) && curr.used === true)
+  } , false)
+
+  if(ifAlreadyUsed){
+    user.Score-=100
+    user.save()
+    return res.status(400).json({msg : "This powercard has already been used by this player..."})
+  }
+  
+  powercard.assignedTo.forEach((curr) => {
+    if(selectedSlot == curr.slot && curr.user.equals(user._id)){
+      curr.used = true;
+    }
+  })
+  powercard.save();
+
+  return res.status(200).json("route is working")
+}

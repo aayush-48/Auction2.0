@@ -23,6 +23,14 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "static.indiatv.in",
+      },
+      {
+        protocol: "https",
+        hostname: "www.vhv.rs",
+      },
+      {
+        protocol: "https",
         hostname: "documents.iplt20.com",
       },
       {
@@ -105,6 +113,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "iplcricbet.com",
       },
+      {
+        protocol : "https",
+        hostname : "tse2.mm.bing.net"
+      }
     ],
   },
 };

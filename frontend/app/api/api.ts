@@ -67,6 +67,9 @@ export const updatePowerCard = (id: string, powerCardData: any) =>
   api.put(`/powerCards/${id}`, powerCardData);
 export const deletePowerCard = (id: string) => api.delete(`/powerCards/${id}`);
 
+export const assignPowercard = (id , teamData : any) => api.post(`/powerCards/assign/${id}` , teamData)
+export const usedPowerCard = (id , teamData : any) => api.patch(`/powerCards/assign/${id}` , teamData)
+
 export const getUsers = () => api.get("/users/");
 export const getUserById = (id: string) => api.get(`/users/${id}`);
 export const updateUserPurse = (id: string, userData: any) =>
