@@ -59,12 +59,6 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
 }) => {
   const finalPriceNum =
     finalPrice.find((slot) => Number(slot.slot_num) === slot_num)?.price || 0;
-  const formatPrice = (price: string | number) => {
-    if (typeof price === "string") {
-      return price.replace("cr", ".00 Cr");
-    }
-    return `${(price / 10000000).toFixed(2)} Cr`;
-  };
 
   const RatingBar = ({ rating, label }: { rating: number; label: string }) => (
     <div className="flex items-center mb-2">
@@ -78,33 +72,6 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       <span className="ml-2 text-sm text-mauve">{rating}</span>
     </div>
   );
-
-  const calculateOverallRating = () => {
-    const { batting, bowling, rtmElite, captaincy } = ratings;
-    let overallRating: number;
-
-    if (
-      type.toLowerCase() === "batsman" ||
-      type.toLowerCase() === "wicket keeper"
-    ) {
-      const battingAvg =
-        (batting.powerplay + batting.middleOvers + batting.deathOvers) / 3;
-      overallRating = (battingAvg + rtmElite + captaincy) / 3;
-    } else if (type.toLowerCase() === "bowler") {
-      const bowlingAvg =
-        (bowling.powerplay + bowling.middleOvers + bowling.deathOvers) / 3;
-      overallRating = (bowlingAvg + rtmElite + captaincy) / 3;
-    } else {
-      // All-rounder
-      const battingAvg =
-        (batting.powerplay + batting.middleOvers + batting.deathOvers) / 3;
-      const bowlingAvg =
-        (bowling.powerplay + bowling.middleOvers + bowling.deathOvers) / 3;
-      overallRating = (battingAvg + bowlingAvg + rtmElite + captaincy) / 4;
-    }
-
-    return (Math.round(overallRating * 10) / 10).toFixed(1);
-  };
 
   const showBatting =
     type.toLowerCase() === "batsman" ||
