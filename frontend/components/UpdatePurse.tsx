@@ -67,7 +67,7 @@ const UpdatePurse = () => {
             <SelectTrigger>
               <SelectValue placeholder="Select a user" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-card">
               {users
                 .filter(
                   (user) =>

@@ -29,7 +29,7 @@ const AssignTeam = () => {
       const teamsRes = await getTeams();
       const usersRes = await getUsers();
       console.log(usersRes);
-      
+
       setTeams(teamsRes.data);
       setUsers(usersRes.data);
     } catch (error) {
@@ -52,7 +52,7 @@ const AssignTeam = () => {
       const response = await assignTeam(selectedTeam, {
         userId: selectedUser,
         finalPrice,
-        slot_num : selectedSlot
+        slot_num: selectedSlot,
       });
       fetchData();
       return response.status;
@@ -77,7 +77,7 @@ const AssignTeam = () => {
             <SelectTrigger>
               <SelectValue placeholder="Select a user" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-card">
               {users
                 .filter(
                   (user) =>
@@ -96,7 +96,7 @@ const AssignTeam = () => {
             <SelectTrigger>
               <SelectValue placeholder="Select a team" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-card">
               {teams.map((team: { _id: string; name: string }) => (
                 <SelectItem key={team._id} value={team._id}>
                   {team.name}
