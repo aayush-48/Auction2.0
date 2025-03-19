@@ -15,6 +15,8 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "s.yimg.com" },
       { protocol: "https", hostname: "e0.pxfuel.com" },
+      { protocol: "https", hostname: "static.indiatv.in" },
+      { protocol: "https", hostname: "www.vhv.rs" },
       {
         protocol: "https",
         hostname: "iplcricbet.com",
@@ -111,6 +113,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "iplcricbet.com",
       },
+      {
+        protocol : "https",
+        hostname : "tse2.mm.bing.net"
+      }
     ],
   },
 };

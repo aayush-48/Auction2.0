@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { act, useState } from "react";
 
 import AssignPlayer from "@/components/AssignPlayer";
 import UnassignPlayer from "@/components/UnassignPlayer";
 import UpdatePurse from "@/components/UpdatePurse";
 import AssignTeam from "@/components/AssignTeam";
+import AssignPowerCard from "@/components/AssignPowerCard";
+import UnassignPowerCard from "@/components/UnassignPowerCard";
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState("teams");
 
@@ -65,6 +67,12 @@ export default function AdminPanel() {
       )}
       {activeTab === "users" && <UpdatePurse />}
       {activeTab === "teams" && <AssignTeam />}
+      {activeTab === "powerCards" && (
+        <div className="flex flex-col gap-10">
+        <AssignPowerCard />
+        <UnassignPowerCard />
+      </div>
+      )}
     </div>
   );
 }

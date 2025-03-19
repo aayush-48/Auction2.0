@@ -26,7 +26,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 const fetchUserPlayers = async (id: string) => {
@@ -46,10 +45,21 @@ const getTypeColor = (type) => {
   return typeMap[type.toLowerCase()] || "bg-gray-500";
 };
 
+const STORAGE_KEY_PREFIX = "cricket_team_";
+const STORAGE_KEYS = {
+  BATTING_POWERPLAY: `${STORAGE_KEY_PREFIX}batting_powerplay`,
+  BATTING_MIDDLE: `${STORAGE_KEY_PREFIX}batting_middle`,
+  BATTING_DEATH: `${STORAGE_KEY_PREFIX}batting_death`,
+  BOWLING_POWERPLAY: `${STORAGE_KEY_PREFIX}bowling_powerplay`,
+  BOWLING_MIDDLE: `${STORAGE_KEY_PREFIX}bowling_middle`,
+  BOWLING_DEATH: `${STORAGE_KEY_PREFIX}bowling_death`,
+  CAPTAIN: `${STORAGE_KEY_PREFIX}captain`,
+  CURRENT_STEP: `${STORAGE_KEY_PREFIX}current_step`,
+};
+
 export default function Calculator() {
   const router = useRouter();
   const { user } = useAuction();
-  const [availablePlayers, setAvailablePlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [teamScore, setTeamScore] = useState(0);
   const [currentStep, setCurrentStep] = useState(0); // Start at step 0 (which is now batting powerplay)
@@ -85,7 +95,7 @@ export default function Calculator() {
     fetchPlayers();
   }, [user, flag]);
 
-  // Define the steps for the sequential flow - add the captain selection step
+  // Define the steps for the sequential flow
   const steps = [
     {
       name: "Batting Powerplay",
@@ -139,11 +149,185 @@ export default function Calculator() {
     { name: "Results", description: "View your team's performance score" },
   ];
 
+  // Fetch players on component mount
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      if (user) {
+        const fetchedPlayers = await fetchUserPlayers(user._id);
+        setPlayers(fetchedPlayers);
+      }
+    };
+    fetchPlayers();
+  }, [user, flag]);
+
+  // Set selected players when players are loaded
   useEffect(() => {
     if (players && players.length > 0) {
       // Set all players as selected players automatically
       setSelectedPlayers(players);
-      setAvailablePlayers(players);
+    }
+  }, [players]);
+
+  // Save selections to localStorage whenever they change
+  useEffect(() => {
+    //console.log(JSON.stringify(battingSelection.powerplay.map((p) => p._id)));
+    if (typeof window !== "undefined" && players.length > 0) {
+      // Save batting selections
+      localStorage.setItem(
+        STORAGE_KEYS.BATTING_POWERPLAY,
+        JSON.stringify(
+          battingSelection.powerplay.map((p) => (p ? p._id : null))
+        )
+      );
+      localStorage.setItem(
+        STORAGE_KEYS.BATTING_MIDDLE,
+        JSON.stringify(
+          battingSelection.middleOvers.map((p) => (p ? p._id : null))
+        )
+      );
+      localStorage.setItem(
+        STORAGE_KEYS.BATTING_DEATH,
+        JSON.stringify(
+          battingSelection.deathOvers.map((p) => (p ? p._id : null))
+        )
+      );
+
+      // Save bowling selections
+      localStorage.setItem(
+        STORAGE_KEYS.BOWLING_POWERPLAY,
+        JSON.stringify(
+          bowlingSelection.powerplay.map((p) => (p ? p._id : null))
+        )
+      );
+      localStorage.setItem(
+        STORAGE_KEYS.BOWLING_MIDDLE,
+        JSON.stringify(
+          bowlingSelection.middleOvers.map((p) => (p ? p._id : null))
+        )
+      );
+      localStorage.setItem(
+        STORAGE_KEYS.BOWLING_DEATH,
+        JSON.stringify(
+          bowlingSelection.deathOvers.map((p) => (p ? p._id : null))
+        )
+      );
+
+      // Save captain
+      localStorage.setItem(STORAGE_KEYS.CAPTAIN, captain ? captain._id : "");
+
+      // Save current step
+      localStorage.setItem(STORAGE_KEYS.CURRENT_STEP, currentStep.toString());
+    }
+  }, [battingSelection, bowlingSelection, captain, currentStep]);
+
+  // Load saved selections from localStorage when players are loaded
+  useEffect(() => {
+    if (typeof window !== "undefined" && players.length > 0) {
+      try {
+        // Helper function to convert player IDs to player objects
+        const getPlayerById = (id) => {
+          return players.find((player) => player._id === id) || null;
+        };
+
+        // Helper function to load and parse array data from localStorage
+        const loadPlayerArrayFromStorage = (key) => {
+          const storedData = localStorage.getItem(key);
+          if (!storedData) return null;
+
+          try {
+            const playerIds = JSON.parse(storedData);
+            return playerIds.map((id) => (id ? getPlayerById(id) : null));
+          } catch (e) {
+            console.error(`Error parsing ${key} from localStorage:`, e);
+            return null;
+          }
+        };
+
+        // Load batting selections
+        const storedBattingPowerplay = loadPlayerArrayFromStorage(
+          STORAGE_KEYS.BATTING_POWERPLAY
+        );
+        console.log(storedBattingPowerplay);
+        const storedBattingMiddle = loadPlayerArrayFromStorage(
+          STORAGE_KEYS.BATTING_MIDDLE
+        );
+        const storedBattingDeath = loadPlayerArrayFromStorage(
+          STORAGE_KEYS.BATTING_DEATH
+        );
+
+        // Load bowling selections
+        const storedBowlingPowerplay = loadPlayerArrayFromStorage(
+          STORAGE_KEYS.BOWLING_POWERPLAY
+        );
+        const storedBowlingMiddle = loadPlayerArrayFromStorage(
+          STORAGE_KEYS.BOWLING_MIDDLE
+        );
+        const storedBowlingDeath = loadPlayerArrayFromStorage(
+          STORAGE_KEYS.BOWLING_DEATH
+        );
+
+        // Load captain
+        const storedCaptainId = localStorage.getItem(STORAGE_KEYS.CAPTAIN);
+        const storedCaptain = storedCaptainId
+          ? getPlayerById(storedCaptainId)
+          : null;
+
+        // Load current step
+        const storedStep = localStorage.getItem(STORAGE_KEYS.CURRENT_STEP);
+
+        // Update state with loaded values if they exist
+        if (storedBattingPowerplay) {
+          setBattingSelection((prev) => ({
+            ...prev,
+            powerplay: storedBattingPowerplay,
+          }));
+        }
+
+        if (storedBattingMiddle) {
+          setBattingSelection((prev) => ({
+            ...prev,
+            middleOvers: storedBattingMiddle,
+          }));
+        }
+
+        if (storedBattingDeath) {
+          setBattingSelection((prev) => ({
+            ...prev,
+            deathOvers: storedBattingDeath,
+          }));
+        }
+
+        if (storedBowlingPowerplay) {
+          setBowlingSelection((prev) => ({
+            ...prev,
+            powerplay: storedBowlingPowerplay,
+          }));
+        }
+
+        if (storedBowlingMiddle) {
+          setBowlingSelection((prev) => ({
+            ...prev,
+            middleOvers: storedBowlingMiddle,
+          }));
+        }
+
+        if (storedBowlingDeath) {
+          setBowlingSelection((prev) => ({
+            ...prev,
+            deathOvers: storedBowlingDeath,
+          }));
+        }
+
+        if (storedCaptain) {
+          setCaptain(storedCaptain);
+        }
+
+        if (storedStep && !isNaN(parseInt(storedStep))) {
+          setCurrentStep(parseInt(storedStep));
+        }
+      } catch (error) {
+        console.error("Error loading data from localStorage:", error);
+      }
     }
   }, [players]);
 
@@ -462,10 +646,15 @@ export default function Calculator() {
               <Badge variant="outline" className="bg-amber-100 text-black">
                 Rating: {player.overallRating}
               </Badge>
-              {player.captaincyRating && (
-                <Badge variant="outline" className="bg-yellow-100 text-black ml-1">
+              {player.captaincyRating ? (
+                <Badge
+                  variant="outline"
+                  className="bg-yellow-100 text-black ml-1"
+                >
                   Captaincy: {player.captaincyRating}
                 </Badge>
+              ) : (
+                ""
               )}
             </div>
           </CardContent>
@@ -699,7 +888,8 @@ export default function Calculator() {
               Select Team Captain
             </h3>
             <p className="text-sm text-gray-500 mb-4">
-              Choose one player to lead your team. Their captaincy rating will be added to your final team score.
+              Choose one player to lead your team. Their captaincy rating will
+              be added to your final team score.
             </p>
 
             <div className="mb-6">
@@ -808,9 +998,14 @@ export default function Calculator() {
   };
 
   useEffect(() => {
-    if(!localStorage.getItem("token") || !localStorage.getItem("slot") || !localStorage.getItem("id") || !localStorage.getItem("role")){
-      localStorage.clear()
-      router.push("/login")
+    if (
+      !localStorage.getItem("token") ||
+      !localStorage.getItem("slot") ||
+      !localStorage.getItem("id") ||
+      !localStorage.getItem("role")
+    ) {
+      localStorage.clear();
+      router.push("/login");
       return;
     }
 
@@ -844,7 +1039,7 @@ export default function Calculator() {
             Refresh
           </Button>
         </div>
-  
+
         <div className="p-4 bg-gray-50 border-b">
           <div className="flex overflow-x-auto">
             {steps.map((step, index) => (
@@ -867,15 +1062,17 @@ export default function Calculator() {
                 </div>
                 <div className="ml-2 mr-4">
                   <div className="text-sm font-medium">{step.name}</div>
-                  <div className="text-xs text-gray-500">{step.description}</div>
+                  <div className="text-xs text-gray-500">
+                    {step.description}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-  
+
         <div className="p-6">{renderStepContent()}</div>
-  
+
         <div className="p-4 bg-gray-50 border-t flex justify-between">
           <Button
             variant="outline"
@@ -886,7 +1083,7 @@ export default function Calculator() {
             <ArrowLeftIcon className="mr-2" size={16} />
             Previous
           </Button>
-  
+
           {currentStep < steps.length - 1 ? (
             <Button
               onClick={() => setCurrentStep(currentStep + 1)}
@@ -897,7 +1094,7 @@ export default function Calculator() {
               <ArrowRightIcon className="ml-2" size={16} />
             </Button>
           ) : (
-            <Button 
+            <Button
               onClick={handleSubmit}
               className="bg-green-600 hover:bg-green-700 flex items-center"
             >
@@ -907,7 +1104,7 @@ export default function Calculator() {
           )}
         </div>
       </motion.div>
-  
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -919,4 +1116,4 @@ export default function Calculator() {
     </div>
     
   );
-}  
+}
