@@ -501,20 +501,10 @@ export default function Calculator() {
     let newBaseScore = 0;
 
     // Batting section scores
-    ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
-      battingSelection[category].forEach((player) => {
-        if (!player) return;
-        newBaseScore += player.overallRating;
-      });
+    players.forEach((player) => {
+      newBaseScore += player.overallRating;
     });
-
-    // Bowling section scores
-    ["powerplay", "middleOvers", "deathOvers"].forEach((category) => {
-      bowlingSelection[category].forEach((player) => {
-        if (!player) return;
-        newBaseScore += player.overallRating;
-      });
-    });
+    console.log(newBaseScore);
 
     // Bonus Calculation
     const calculateBonus = (players, category) => {
@@ -1114,6 +1104,5 @@ export default function Calculator() {
         </DialogContent>
       </Dialog>
     </div>
-    
   );
 }

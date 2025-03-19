@@ -23,7 +23,6 @@ router
 router.route("/updateWallet/:id").post(protect, admin, updateUserWallet);
 router.route("/purse/:id").get(fetchUserWallet);
 router.route("/login").post(login);
-
 router.route("/score/:id").post(updateScore);
 
 export default router;

@@ -61,14 +61,18 @@ export const fetchTeamPurse = (id: string, slot: number) =>
   api.get(`/teams/purse/${id}`, { params: { slot: slot } });
 
 export const getPowerCards = () => api.get("/powerCards");
+export const getPowerCardsByUserId = (id: string) =>
+  api.get(`/powerCards/user/${id}`);
 export const createPowerCard = (powerCardData: any) =>
   api.post("/powerCards", powerCardData);
 export const updatePowerCard = (id: string, powerCardData: any) =>
   api.put(`/powerCards/${id}`, powerCardData);
 export const deletePowerCard = (id: string) => api.delete(`/powerCards/${id}`);
 
-export const assignPowercard = (id , teamData : any) => api.post(`/powerCards/assign/${id}` , teamData)
-export const usedPowerCard = (id , teamData : any) => api.patch(`/powerCards/assign/${id}` , teamData)
+export const assignPowercard = (id, teamData: any) =>
+  api.post(`/powerCards/assign/${id}`, teamData);
+export const usedPowerCard = (id, teamData: any) =>
+  api.patch(`/powerCards/assign/${id}`, teamData);
 
 export const getUsers = () => api.get("/users/");
 export const getUserById = (id: string) => api.get(`/users/${id}`);
