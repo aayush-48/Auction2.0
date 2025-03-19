@@ -8,8 +8,8 @@ const nextConfig = {
   },
   reactStrictMode: true,
   env: {
-    // NEXT_PUBLIC_API_URL: "https://aution2-0.onrender.com/api",
-    NEXT_PUBLIC_API_URL : "http://localhost:5001/api"
+    NEXT_PUBLIC_API_URL: "https://aution2-0.onrender.com/api",
+    // NEXT_PUBLIC_API_URL : "http://localhost:5001/api"
   },
   images: {
     remotePatterns: [
@@ -114,9 +114,9 @@ const nextConfig = {
         hostname: "iplcricbet.com",
       },
       {
-        protocol : "https",
-        hostname : "tse2.mm.bing.net"
-      }
+        protocol: "https",
+        hostname: "tse2.mm.bing.net",
+      },
     ],
   },
 };
