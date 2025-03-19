@@ -114,7 +114,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   const glowColor = getGlowColor();
 
   const showBatting =
-    type.toLowerCase() === "batsman" || type.toLowerCase() === "all rounder";
+    type.toLowerCase() === "batsman" ||
+    type.toLowerCase() === "all rounder" ||
+    type.toLowerCase() === "wicket keeper";
   const showBowling =
     type.toLowerCase() === "bowler" || type.toLowerCase() === "all rounder";
   const showCaptaincy = captaincyRating > 0;
