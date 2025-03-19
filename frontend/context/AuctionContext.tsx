@@ -11,16 +11,16 @@ import {
 } from "../app/api/api";
 
 export interface Player {
-  id: string;
-  name: string;
+   name: string;
   country: string;
   gender: string;
   type: string;
-  team: string;
   basePrice: number;
-  finalPrice: { slot_num: number; price: number }[];
-  photo: string;
+  finalPrice: number[];
+  src?: string;
+  rtmTeam?: string;
   overallRating: number;
+  captaincyRating: number;
   ratings: {
     batting: {
       powerplay: number;
@@ -32,11 +32,9 @@ export interface Player {
       middleOvers: number;
       deathOvers: number;
     };
-    rtmElite: number;
-    captaincy: number;
   };
-  rtmTeam?: string;
-  isElite?: boolean;
+  isLegendary: boolean;
+  isUnderdog: boolean;
 }
 
 export interface Team {

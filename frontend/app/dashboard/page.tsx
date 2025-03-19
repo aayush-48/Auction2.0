@@ -100,16 +100,14 @@ export default function Dashboard() {
   }, 0);
 
   const remainingPurse = Math.max(0, purse - teamValue); 
-  const totalPowercards = 5;
-  const usedPowercards = 2;
 
   const PlayerSection = ({ title, players, icon }: { title: string; players: typeof batsmen; icon: React.ReactNode }) => (
-    <div className="mb-8">
+    <div className="mb-8 ">
       <h3 className="text-xl font-bold mb-4 text-heliotrope flex items-center">
         {icon}
         <span className="ml-2">{title}</span>
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {players.map(player => (
           <PlayerCard
             key={player._id}
@@ -127,37 +125,61 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col md:flex-row min-h-screen">
+      {/* Sidebar */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-r from-russian-violet-2 to-tekhelet bg-opacity-30 backdrop-filter backdrop-blur-lg rounded-lg p-6 shadow-lg"
+        className="bg-gradient-to-b from-russian-violet-2 to-tekhelet bg-opacity-30 backdrop-filter backdrop-blur-lg md:w-64 w-full p-4 md:min-h-screen shadow-lg"
       >
-        <h2 className="text-2xl font-bold mb-4 text-heliotrope">Team Overview</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <h2 className="text-2xl font-bold mb-6 text-heliotrope">Team Overview</h2>
+        
+        <div className="flex justify-center mb-4">
+          {team.img && (
+            <Image 
+              src={team.img} 
+              width={120} 
+              height={120} 
+              alt={team.name || "team-logo"} 
+             
+            />
+          )}
+        </div>
+        
+        <div className="space-y-6">
           <div>
             <p className="text-sm text-gray-400">Total Players</p>
-            <p className="text-3xl font-bold text-white">{players.length}</p>
+            <p className="text-2xl font-bold text-white">{players.length}</p>
           </div>
           <div>
             <p className="text-sm text-gray-400">Team Value</p>
-            <p className="text-3xl font-bold text-white">{teamValue} Cr</p>
+            <p className="text-2xl font-bold text-white">{teamValue} Cr</p>
           </div>
           <div>
             <p className="text-sm text-gray-400">Total Purse</p>
-            <p className="text-3xl font-bold text-white">{purse} Cr</p>
+            <p className="text-2xl font-bold text-white">{purse} Cr</p>
           </div>
-          <Image src={team ? team.img : null} width={150} height={100} alt={team.name || "team-logo"} />
+          <div>
+            <p className="text-sm text-gray-400">Remaining Purse</p>
+            <p className="text-2xl font-bold text-white">{remainingPurse} Cr</p>
+          </div>
+        
         </div>
       </motion.div>
-      <div className="min-w-full flex justify-between">
-        <h2 className="text-2xl font-bold mb-4 m-5 text-heliotrope">Your Players</h2>
-        <Button className="m-5" variant="outline" onClick={() => setFlag(prevFlag => !prevFlag)}>
-          Refresh
-        </Button>
-      </div>
-      <div className="flex flex-col m-10">
+
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-heliotrope">Your Players</h2>
+          <Button 
+            variant="outline" 
+            onClick={() => setFlag(prevFlag => !prevFlag)}
+          >
+            Refresh
+          </Button>
+        </div>
+        
         <PlayerSection title="Batsmen" players={batsmen} icon={<GiCricketBat className="w-6 h-6" />} />
         <PlayerSection title="Bowlers" players={bowlers} icon={<GiBowlingPin className="w-6 h-6" />} />
         <PlayerSection title="All-rounders" players={allRounders} icon={<GiAlliedStar className="w-6 h-6" />} />

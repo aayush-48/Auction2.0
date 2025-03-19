@@ -46,18 +46,27 @@ export default function Login() {
       setError(error.response?.data?.message || "Invalid credentials");
     }
     setLoading(false);
+  }; // <== Ensure this function is properly closed here
+
+  // Move backgroundStyle outside handleSubmit
+  const backgroundStyle = {
+    backgroundImage: "url('/images/ipl_bg.jpeg')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    height: "100vh",
+    width: "100vw",
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[url('/images/ipl_bg.jpeg')] bg-cover bg-center bg-no-repeat">
-      <div className="bg-french-violet bg-opacity-30 p-8 rounded-lg shadow-lg w-96 backdrop-blur-md">
-        <h1 className="text-3xl font-bold mb-6 text-center text-heliotrope">
+    <div style={backgroundStyle} className="min-h-screen flex items-center justify-center">
+      <div className="bg-[#14a39e] bg-opacity-25 backdrop-blur-lg p-8 rounded-xl shadow-xl w-96 border-2 border-[#14a39e] relative overflow-hidden">
+        <h1 className="text-3xl font-bold mb-6 text-center text-[#031230]">
           Login
         </h1>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-mauve mb-2">
+            <label htmlFor="username" className="block text-[#031230] mb-2">
               Username
             </label>
             <input
@@ -65,12 +74,12 @@ export default function Login() {
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 bg-russian-violet bg-opacity-50 rounded-md text-white"
+              className="w-full px-3 py-2 bg-white bg-opacity-20 backdrop-blur-md rounded-md text-white placeholder-gray-300 border border-[#00A6FF] focus:border-[#00C8FF] focus:outline-none transition-all duration-300 hover:shadow-neon"
               required
             />
           </div>
           <div className="mb-6">
-            <label htmlFor="password" className="block text-mauve mb-2">
+            <label htmlFor="password" className="block text-[#031230] mb-2">
               Password
             </label>
             <input
@@ -78,14 +87,14 @@ export default function Login() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 bg-russian-violet bg-opacity-50 rounded-md text-white"
+              className="w-full px-3 py-2 bg-white bg-opacity-20 backdrop-blur-md rounded-md text-white placeholder-gray-300 border border-[#00A6FF] focus:border-[#00C8FF] focus:outline-none transition-all duration-300 hover:shadow-neon"
               required
             />
           </div>
           <Button
             disabled={loading}
             type="submit"
-            className="w-full bg-amethyst hover:bg-heliotrope text-white font-bold py-2 px-4 rounded transition-colors duration-300 flex items-center justify-center"
+            className="w-full bg-[#031230] hover:bg-[rgb(8,143,143)] text-white font-bold py-2 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-neon"
           >
             {loading ? <Loader2 className="animate-spin mr-2" /> : ""}
             Login

@@ -11,47 +11,38 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "russian-violet": "#10002b",
-        "russian-violet-2": "#240046",
-        tekhelet: "#5a189a",
-        "french-violet": "#7b2cbf",
-        amethyst: "#9d4edd",
-        heliotrope: "#c77dff",
-        mauve: "#e0aaff",
+        // 🔵 Replacing purple shades with blue shades while keeping the same class names
+        "russian-violet": "#0A192F", // Dark navy blue
+        "russian-violet-2": "#112D4E", // Deep blue
+        tekhelet: "#3A7CA5", // Muted blue
+        "french-violet": "#4682B4", // Steel blue
+        amethyst: "#5DADE2", // Lighter sky blue
+        heliotrope: "#76C7F7", // Soft azure blue
+        mauve: "#B0E0E6", // Pale blue
         white: "#ffffff",
-        // Keep the existing color definitions below
+
+        // Keep existing Tailwind color variables
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#4682B4", // Steel Blue
+          foreground: "#B0E0E6", // Pale Blue
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#3A7CA5", // Muted Blue
+          foreground: "#76C7F7", // Soft Azure
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "#5DADE2", // Lighter Sky Blue
+          foreground: "#ffffff",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#0A192F", // Dark Navy Blue
+          foreground: "#B0E0E6", // Pale Blue
         },
       },
       backgroundImage: {
@@ -65,5 +56,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
-
+};
