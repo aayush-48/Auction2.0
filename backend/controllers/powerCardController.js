@@ -88,10 +88,22 @@ export const assignPowerCard = async (req, res) => {
     },
     false
   );
+  const slotAlreadyContainsSameCard = powercard.assignedTo.reduce(
+    (accumulator, curr) => {
+      return (
+        curr.slot == selectedSlot || accumulator
+      );
+    },
+    false
+  );
   // console.log(userAlreadyContainsSameCard);
 
   if (userAlreadyContainsSameCard) {
     return res.status(400).json({ msg: "User already contains the card" });
+  }
+  
+  if (slotAlreadyContainsSameCard) {
+    return res.status(400).json({ msg: "Slot already contains the card in another team" });
   }
 
   if (user.Purse < finalPrice) {
