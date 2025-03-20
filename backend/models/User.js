@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
@@ -14,5 +16,31 @@ const userSchema = new mongoose.Schema({
   Score: { type: Number, default: 0 },
   role: { type: String, required: true },
 });
+
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) {
+    // If the password is not modified, skip hashing
+    return next();
+  }
+  console.log("Hashing password...");
+  
+  const salt = await bcrypt.genSalt(10)
+  this.password = await bcrypt.hash(this.password, salt)
+})
+
+userSchema.methods.createJWT = function () {
+  return jwt.sign(
+    { userId: this._id, name: this.username },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  )
+}
+
+userSchema.methods.comparePassword = async function (canditatePassword) {
+  const isMatch = await bcrypt.compare(canditatePassword, this.password)
+  return isMatch
+}
 
 export default mongoose.model("User", userSchema);
