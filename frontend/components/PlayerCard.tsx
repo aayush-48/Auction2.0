@@ -86,6 +86,14 @@ const teamFlags: Record<string, string> = {
 const countryFlags: Record<string, string> = {
   ind: "/images/countryFlags/ind.png",
   sa: "/images/countryFlags/sa.png",
+  afg: "/images/countryFlags/afg.png",
+  aus: "/images/countryFlags/aus.jpeg",
+  eng: "/images/countryFlags/eng.jpg",
+  ire: "/images/countryFlags/ire.png",
+  nz: "/images/countryFlags/nz.png",
+  sl: "/images/countryFlags/sl.jpeg",
+  wi: "/images/countryFlags/wi.jpg",
+  zim: "/images/countryFlags/zim.jpeg",
 };
 const PlayerCard: React.FC<PlayerCardProps> = ({
   name,
