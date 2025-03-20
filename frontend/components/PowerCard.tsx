@@ -95,7 +95,7 @@ const PowerCard: React.FC<PowerCardProps> = ({
                 <p className="text-sm text-amber-100">{name}</p>
               </div>
 
-              <div className="flex flex-col h-20">
+              <div className="flex flex-col h-4/5">
                 <h4 className="text-sm font-semibold text-amber-200 mb-1">
                   Description:
                 </h4>
@@ -103,32 +103,7 @@ const PowerCard: React.FC<PowerCardProps> = ({
                   <p className="text-sm text-amber-100">{description}</p>
                 </div>
               </div>
-
-              <div>
-                <h4 className="text-sm font-semibold text-amber-200 mb-1">
-                  ID:
-                </h4>
-                <p className="text-xs text-amber-100/80">{_id}</p>
-              </div>
             </div>
-
-            {assignedTo.length > 0 && (
-              <div className="mt-auto pt-2">
-                <h4 className="text-sm font-semibold text-amber-200 mb-1">
-                  Assigned To:
-                </h4>
-                <div className="flex flex-wrap gap-1 max-h-16 overflow-y-auto custom-scrollbar">
-                  {assignedTo.map((player, index) => (
-                    <span
-                      key={index}
-                      className="text-xs bg-amber-400/20 text-amber-200 px-2 py-1 rounded-full"
-                    >
-                      {player}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Add some global styles for custom scrollbar */}
             <style jsx global>{`
