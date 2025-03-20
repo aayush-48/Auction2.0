@@ -180,7 +180,7 @@ export const getPowerCardsByUserId = async (req, res) => {
     if (!user) {
       return res.status(404).json({ msg: "User not found..." });
     }
-    const pcs_ids = user.power_card_ids;
+    const pcs_ids = user.power_card_id;
     let powerCards = await PowerCard.find({ _id: { $in: pcs_ids } });
     res.status(200).json(powerCards);
   } catch (err) {

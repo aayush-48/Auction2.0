@@ -16,7 +16,6 @@ import {
   UserIcon,
   XIcon,
   BarChart3Icon,
-  CheckCircleIcon,
   ShieldIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -27,7 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
+import StepIndicator from "@/components/AutoScrollStepIndicator";
 const fetchUserPlayers = async (id: string) => {
   const response = await getPlayersByUser(id);
   return response.data;
@@ -594,52 +593,75 @@ export default function Calculator() {
     return (
       <Card
         key={player._id}
-        className={`relative group transition-all ${
-          isDisabled ? "opacity-50" : "hover:shadow-md"
-        } ${isCaptain ? "border-2 border-yellow-500" : ""}`}
+        className={`
+        relative overflow-hidden rounded-lg transition-all duration-300
+        ${
+          isDisabled
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:shadow-lg hover:scale-105"
+        }
+        ${isCaptain ? "border-2 border-yellow-500" : "border border-gray-200"}
+      `}
       >
-        {showRemoveButton && (
-          <button
-            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-            onClick={() => handleRemovePlayer(player)}
-          >
-            <XIcon size={14} />
-          </button>
-        )}
+        {/* Background gradient header */}
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-br from-indigo-500 to-purple-600" />
 
-        <div className="absolute top-0 left-0 right-0">
+        {/* Player type and captain badges */}
+        <div className="absolute top-0 left-0 right-0 flex flex-wrap gap-1 p-2">
           <Badge
-            className={`${getTypeColor(player.type)} text-black text-xs m-2`}
+            className={`${getTypeColor(
+              player.type
+            )} text-xs font-medium shadow-sm`}
           >
             {player.type}
           </Badge>
           {isCaptain && (
-            <Badge className="bg-yellow-500 text-black text-xs m-2 ml-0">
+            <Badge className="bg-yellow-500 text-black text-xs font-medium shadow-sm">
               Captain
             </Badge>
           )}
         </div>
 
-        <div className="pt-6">
-          <div className="flex justify-center">
+        {/* Remove button */}
+        {showRemoveButton && (
+          <button
+            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 
+                    opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-600 shadow-sm"
+            onClick={() => handleRemovePlayer(player)}
+            aria-label="Remove player"
+          >
+            <XIcon size={16} />
+          </button>
+        )}
+
+        {/* Main content */}
+        <div className="relative pt-10 pb-3 flex flex-col items-center">
+          {/* Player image with ring */}
+          <div className="relative mb-2">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 p-0.5 blur-sm" />
             <img
               src={player.src}
               alt={player.name}
-              className="rounded-full w-24 h-24 object-cover border-2 border-gray-200"
+              className="relative rounded-full w-24 h-24 object-cover border-2 border-white shadow-md"
             />
           </div>
 
-          <CardContent className="text-center pb-2 pt-3">
-            <h3 className="font-semibold truncate">{player.name}</h3>
-            <p className="text-xs text-gray-500">{player.country}</p>
-            <div className="flex justify-center mt-2">
-              <Badge variant="outline" className="bg-amber-100 text-black">
+          {/* Player info */}
+          <CardContent className="text-center w-full p-3">
+            <h3 className="font-bold text-lg truncate">{player.name}</h3>
+            <p className="text-sm text-gray-500 mb-3">{player.country}</p>
+
+            <div className="flex flex-wrap justify-center gap-2 mt-2">
+              <Badge
+                variant="outline"
+                className="bg-amber-100 text-amber-800 font-medium py-1"
+              >
                 Rating: {player.overallRating}
               </Badge>
               {player.captaincyRating ? (
                 <Badge
                   variant="outline"
-                  className="bg-yellow-100 text-black ml-1"
+                  className="bg-yellow-100 text-yellow-800 font-medium py-1"
                 >
                   Captaincy: {player.captaincyRating}
                 </Badge>
@@ -649,14 +671,15 @@ export default function Calculator() {
             </div>
           </CardContent>
 
+          {/* Action button */}
           {isAssignmentStep && !isDisabled && (
-            <CardFooter className="pt-0 pb-3 justify-center">
+            <CardFooter className="pt-0 pb-3 px-4 justify-center w-full">
               <Button
                 size="sm"
-                className="w-full"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md transition-all"
                 onClick={() => handleAssignPlayer(player, currentStep)}
               >
-                {currentStep === 6 ? "Select as Captain" : "Assign"}
+                {currentStep === 6 ? "Select as Captain" : "Assign Player"}
               </Button>
             </CardFooter>
           )}
@@ -781,7 +804,7 @@ export default function Calculator() {
         <div className="space-y-6">
           <div className="flex flex-col items-center py-6">
             <div className="text-6xl font-bold text-indigo-600">
-              {Math.round(teamScore * 100) / 100}
+              {teamScore}
             </div>
             <p className="text-gray-500 mt-2">Total Team Score</p>
           </div>
@@ -911,7 +934,7 @@ export default function Calculator() {
     return (
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-medium mb-2 text-black">
+          <h3 className="text-lg font-medium mb-2 text-turquoise">
             Assign Players for {step.name}
           </h3>
           <p className="text-sm text-gray-500 mb-4">
@@ -1005,80 +1028,56 @@ export default function Calculator() {
   }, []);
 
   return (
-    <div className="space-y-4 max-w-6xl mx-auto my-10">
+    <div className="space-y-4 max-w-6xl mx-auto my-10 scale-80">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white rounded-lg shadow-lg overflow-hidden"
+        className="bg-[#0f2744] rounded-lg overflow-hidden border border-[#1e3a5e]"
       >
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 flex justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-white">
-              Cricket Team Calculator
-            </h2>
-            <p className="text-purple-100 text-sm">
-              Build and optimize your dream cricket team
-            </p>
-          </div>
-          <Button
-            className="m-5"
-            variant={"outline"}
-            onClick={() => setFlag((prevFlag) => !prevFlag)}
-          >
-            Refresh
-          </Button>
+        <Button
+          variant="outline"
+          onClick={() => setFlag((prevFlag) => !prevFlag)}
+          className="bg-transparent border border-blue-400 text-blue-300 hover:bg-blue-900 hover:text-blue-100 absolute right-6"
+        >
+          Refresh
+        </Button>
+
+        <StepIndicator
+          steps={steps}
+          currentStep={currentStep}
+          isStepComplete={isStepComplete}
+        ></StepIndicator>
+
+        <div className="p-6 bg-[#0f2744] text-blue-100">
+          {renderStepContent()}
         </div>
 
-        <div className="p-4 bg-gray-50 border-b">
-          <div className="flex overflow-x-auto">
-            {steps.map((step, index) => (
-              <div key={index} className="flex items-center min-w-max">
-                {index > 0 && <div className="w-8 h-px bg-gray-300"></div>}
-                <div
-                  className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                    currentStep === index
-                      ? "bg-indigo-600 text-white"
-                      : isStepComplete(index)
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  {isStepComplete(index) ? (
-                    <CheckCircleIcon size={16} />
-                  ) : (
-                    index + 1
-                  )}
-                </div>
-                <div className="ml-2 mr-4">
-                  <div className="text-sm font-medium">{step.name}</div>
-                  <div className="text-xs text-gray-500">
-                    {step.description}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="p-6">{renderStepContent()}</div>
-
-        <div className="p-4 bg-gray-50 border-t flex justify-between">
+        <div className="p-4 bg-[#122a46] border-t border-[#1e3a5e] flex justify-between">
           <Button
             variant="outline"
             onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
             disabled={currentStep === 0}
-            className="flex items-center"
+            className="flex items-center bg-transparent border border-blue-400 text-blue-300 hover:bg-blue-900 hover:text-blue-100 disabled:opacity-50 disabled:hover:bg-transparent"
           >
             <ArrowLeftIcon className="mr-2" size={16} />
             Previous
           </Button>
 
+          {currentStep != steps.length - 1 ? (
+            <div className="flex gap-2 justify-center items-center">
+              <span className="text-blue-200">Team Score: </span>
+              <div className="text-xl font-bold text-blue-300">{teamScore}</div>
+            </div>
+          ) : (
+            ""
+          )}
+
           {currentStep < steps.length - 1 ? (
             <Button
               onClick={() => setCurrentStep(currentStep + 1)}
               disabled={!canProceedToNextStep()}
-              className="flex items-center"
+              className="flex items-center bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:hover:bg-blue-600"
             >
               Next
               <ArrowRightIcon className="ml-2" size={16} />
@@ -1086,7 +1085,7 @@ export default function Calculator() {
           ) : (
             <Button
               onClick={handleSubmit}
-              className="bg-green-600 hover:bg-green-700 flex items-center"
+              className="bg-blue-600 hover:bg-blue-700 text-white flex items-center"
             >
               Submit Score
               <BarChart3Icon className="ml-2" size={16} />
@@ -1096,10 +1095,12 @@ export default function Calculator() {
       </motion.div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-[#0f2744] border border-[#1e3a5e] text-blue-100">
           <DialogHeader>
-            <DialogTitle className="text-red-500">Error</DialogTitle>
-            <DialogDescription>{errorMsg}</DialogDescription>
+            <DialogTitle className="text-red-400">Error</DialogTitle>
+            <DialogDescription className="text-blue-200">
+              {errorMsg}
+            </DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>

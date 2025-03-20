@@ -99,8 +99,8 @@ const PowerCard: React.FC<PowerCardProps> = ({
                 <h4 className="text-sm font-semibold text-amber-200 mb-1">
                   Description:
                 </h4>
-                <div className="overflow-y-auto pr-1 custom-scrollbar flex-1">
-                  <p className="text-sm text-amber-100">{description}</p>
+                <div className="overflow-y-auto pr-1 custom-scrollbar flex-1 my-2">
+                  <p className="text-xs text-amber-100">{description}</p>
                 </div>
               </div>
             </div>

@@ -5,6 +5,7 @@ import { useAuction } from "../../context/AuctionContext";
 import PlayerCard from "../../components/PlayerCard";
 import { useRouter } from "next/navigation";
 import { GiCricketBat, GiBowlingPin, GiAlliedStar } from "react-icons/gi";
+import { BiCricketBall } from "react-icons/bi";
 import type React from "react";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -221,10 +222,6 @@ export default function Dashboard() {
             <p className="text-sm text-gray-400">Total Purse</p>
             <p className="text-2xl font-bold text-white">{purse} Cr</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-400">Remaining Purse</p>
-            <p className="text-2xl font-bold text-white">{remainingPurse} Cr</p>
-          </div>
         </div>
       </motion.div>
 
@@ -248,7 +245,7 @@ export default function Dashboard() {
         <PlayerSection
           title="Bowlers"
           players={bowlers}
-          icon={<GiBowlingPin className="w-6 h-6" />}
+          icon={<BiCricketBall className="w-6 h-6" />}
         />
         <PlayerSection
           title="All-rounders"
