@@ -193,12 +193,12 @@ export const getPowerCardsByUserId = async (req, res) => {
       return res.status(404).json({ msg: "User not found..." });
     }
     const pcs_ids = user.power_card_id;
-    let powerCards = await PowerCard.find({ _id: { $in: pcs_ids } });
+    let powerCards = await PowerCard.find({ _id : { $in: pcs_ids } });
+    console.log(pcs_ids);
     res.status(200).json(powerCards);
   } catch (err) {
     console.error(err);
-    return res
-      .status(500)
+    return res.status(500)
       .json({ msg: "Error in powercard fetching for a user." });
   }
 };
