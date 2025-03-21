@@ -95,6 +95,7 @@ const countryFlags: Record<string, string> = {
   wi: "/images/countryFlags/wi.jpg",
   zim: "/images/countryFlags/zim.jpeg",
 };
+
 const PlayerCard: React.FC<PlayerCardProps> = ({
   name,
   country,
@@ -128,7 +129,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   const showBowling =
     type.toLowerCase() === "bowler" || type.toLowerCase() === "all rounder";
   const showCaptaincy = captaincyRating > 0;
-  const showRtmTeam = !isLegendary && !isUnderdog;
+  const showRtmTeam = !isLegendary && !isUnderdog && rtmTeam !== "";
 
   const getCountryFlagSrc = () => {
     if (country && countryFlags[country]) {
@@ -204,7 +205,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
                   )}
                 </p>
                 <div className="flex items-center gap-2">
-                  {showRtmTeam && (
+                  {showRtmTeam && rtmTeam && teamFlags[rtmTeam] && (
                     <img
                       src={teamFlags[rtmTeam]}
                       alt={`${rtmTeam} flag`}

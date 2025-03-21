@@ -25,7 +25,7 @@ const getCardImage = (cardName: string): string => {
     return "/images/powerCards/silent_heist.png";
   }
 
-  return "/images/powerCards/default.png";
+  return "/images/powerCards/default.jpg";
 };
 
 const PowerCard: React.FC<PowerCardProps> = ({ name, description }) => {

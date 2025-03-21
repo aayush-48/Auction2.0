@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useAuction } from "../../context/AuctionContext";
 import PlayerCard from "../../components/PlayerCard";
 import { useRouter } from "next/navigation";
-import { GiCricketBat, GiBowlingPin, GiAlliedStar } from "react-icons/gi";
+import { GiCricketBat, GiAlliedStar } from "react-icons/gi";
 import { BiCricketBall } from "react-icons/bi";
 import type React from "react";
 import { Spinner } from "@/components/ui/spinner";
