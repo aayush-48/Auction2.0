@@ -14,6 +14,7 @@ import { Input } from "./ui/input";
 import { Card } from "./ui/card";
 import { toast } from "sonner";
 import { Player } from "@/context/AuctionContext";
+
 const AssignPlayer = () => {
   const [players, setPlayers] = useState([]);
   const [teams, setTeams] = useState([]);
@@ -21,11 +22,12 @@ const AssignPlayer = () => {
   const [selectedSlot, setSelectedSlot] = useState("");
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [finalPrice, setFinalPrice] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
   const fetchData = async () => {
     try {
       const playersRes = await getPlayers();
-      // playersRes= playersRes.data.sort()
       playersRes.data.sort((a: Player, b: Player) =>
         a.name.localeCompare(b.name)
       );
@@ -35,8 +37,12 @@ const AssignPlayer = () => {
       setTeams(teamsRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
+      toast("Error", {
+        description: "Failed to load players and teams",
+      });
     }
   };
+
   useEffect(() => {
     const role = localStorage.getItem("role");
     if (role !== "admin") {
@@ -45,20 +51,90 @@ const AssignPlayer = () => {
       fetchData();
     }
   }, [router]);
+
+  const handlePriceChange = (e) => {
+    // Allow empty string for initial input
+    if (e.target.value === "") {
+      setFinalPrice("");
+      return;
+    }
+
+    // Parse the input value to number
+    const value = parseFloat(e.target.value);
+
+    // Validate to ensure it's a number and not negative
+    if (!isNaN(value) && value >= 0) {
+      // Format to at most 1 decimal place
+      setFinalPrice(value.toString());
+    }
+  };
+
+  const handlePriceStep = (increment) => {
+    // If finalPrice is empty, start from 0
+    const currentValue = finalPrice === "" ? 0 : parseFloat(finalPrice);
+
+    // Calculate the step based on the current value
+    const step = currentValue < 10 ? 0.5 : 1;
+
+    // Calculate the new value
+    let newValue = currentValue + (increment ? step : -step);
+
+    // Ensure the value doesn't go below 0
+    newValue = Math.max(0, newValue);
+
+    // For values below 10, ensure we maintain the .0 or .5 format
+    if (newValue < 10) {
+      // Round to nearest 0.5
+      newValue = Math.round(newValue * 2) / 2;
+    } else {
+      // Round to nearest integer for values >= 10
+      newValue = Math.round(newValue);
+    }
+
+    // Update the finalPrice state
+    setFinalPrice(newValue.toString());
+  };
+
   const handleAssignPlayer = async () => {
-    if (!selectedTeam || !selectedSlot || !selectedPlayer) return;
+    if (!selectedTeam || !selectedSlot || !selectedPlayer || !finalPrice) {
+      toast("Invalid input", {
+        description: "Please fill all fields",
+      });
+      return;
+    }
+
+    setLoading(true);
     try {
       const response = await assignPlayer(selectedPlayer, {
         selectedSlot,
         selectedTeam,
         finalPrice,
       });
-      fetchData(); // Refresh users after update
-      return response.status;
+
+      toast("Success", {
+        description: `${response.data.playerName} assigned to ${response.data.teamName} in slot ${selectedSlot}`,
+      });
+
+      // Reset fields
+      setSelectedPlayer(null);
+      setSelectedSlot("");
+      setFinalPrice("");
+
+      fetchData(); // Refresh data
+      return response;
     } catch (error) {
-      console.error("Error updating purse value:", error);
+      console.error("Error assigning player:", error);
+      const errorMessage =
+        error.response?.data?.error || "Failed to assign player";
+      toast("Error", {
+        description: errorMessage,
+      });
+      return error.response;
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <Card className="p-4 shadow-md rounded-lg w-1/2">
       <h3 className="text-xl font-semibold mb-4">Assign Player</h3>
@@ -83,6 +159,7 @@ const AssignPlayer = () => {
             ))}
           </SelectContent>
         </Select>
+
         <Select onValueChange={setSelectedPlayer}>
           <SelectTrigger>
             <SelectValue placeholder="Select a player" />
@@ -95,36 +172,45 @@ const AssignPlayer = () => {
             ))}
           </SelectContent>
         </Select>
-        <Input
-          className=""
-          type="number"
-          placeholder="Set final price"
-          value={finalPrice}
-          onChange={(e) => setFinalPrice(e.target.value)}
-        />
+
+        <div className="flex items-center">
+          <Button
+            type="button"
+            variant="outline"
+            className="px-3"
+            onClick={() => handlePriceStep(false)}
+          >
+            -
+          </Button>
+          <Input
+            className="mx-2"
+            type="number"
+            step={parseFloat(finalPrice) < 10 ? "0.5" : "1"}
+            min="0"
+            placeholder="Set final price"
+            value={finalPrice}
+            onChange={handlePriceChange}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            className="px-3"
+            onClick={() => handlePriceStep(true)}
+          >
+            +
+          </Button>
+        </div>
+        <div className="text-xs text-gray-500">
+          Price increases by 0.5 up to 10, then by 1 after that
+        </div>
       </div>
+
       <Button
         className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-        onClick={async () => {
-          const response = await handleAssignPlayer();
-          console.log(response);
-          if (response == 200 || response == 204) {
-            toast("Player assigned", {
-              description: `${
-                players.find((player) => player._id === selectedPlayer)?.name
-              } has been assigned the team ${
-                teams.find((team) => team._id === selectedTeam)?.name ||
-                "Unknown User"
-              } in slot ${selectedSlot}`,
-            });
-          } else {
-            toast("Could not assign player", {
-              description: `Error occurred while assigning player`,
-            });
-          }
-        }}
+        disabled={loading}
+        onClick={handleAssignPlayer}
       >
-        Assign Player
+        {loading ? "Assigning..." : "Assign Player"}
       </Button>
     </Card>
   );

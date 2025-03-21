@@ -98,21 +98,19 @@ export const assignPlayer = async (req, res) => {
       ipl_team_id: selectedTeam,
       slot_num: selectedSlot,
     });
-    //console.log(selectedUser.player_ids.length >= 11);
 
     if (selectedUser.player_ids.length >= 11) {
-      return res
-        .status(400)
-        .json({ message: "Cannot have more than 11 players re baba..." });
+      return res.status(400).json({ error: "Team already has 11 players" });
     }
 
     if (!selectedUser) {
       return res
         .status(400)
-        .json({ message: "Could not find user for assignment." });
+        .json({ error: "User not found for selected team and slot" });
     }
+
     if (finalPrice > selectedUser.Purse) {
-      return res.status(400).json({ message: "Purse value too low" });
+      return res.status(400).json({ error: "Insufficient purse value" });
     }
 
     // Ensure player_ids exists and is an array
@@ -124,13 +122,13 @@ export const assignPlayer = async (req, res) => {
     if (selectedUser.player_ids.includes(playerId)) {
       return res
         .status(400)
-        .json({ message: "Player is already assigned to this user." });
+        .json({ error: "Player already assigned to this user" });
     }
 
     // Fetch the player details
     const player = await Player.findOne({ _id: playerId });
     if (!player) {
-      return res.status(400).json({ message: "Player not found." });
+      return res.status(400).json({ error: "Player not found" });
     }
 
     // Category Limits
@@ -175,12 +173,11 @@ export const assignPlayer = async (req, res) => {
       player.type === "All Rounder" ||
       player.type === "Wicket Keeper"
     ) {
-      // console.log(categoryCount);
       if (categoryCount[player.type] >= categoryLimits[player.type].max) {
         selectedUser.Score -= 100; // Deduct 100 score points
         await selectedUser.save();
         return res.status(400).json({
-          message: `Cannot add more ${player.type}s. Maximum limit reached.`,
+          error: `Maximum limit reached for ${player.type}s`,
         });
       }
     }
@@ -197,7 +194,7 @@ export const assignPlayer = async (req, res) => {
       selectedUser.Score -= 100; // Deduct 100 score points
       await selectedUser.save(); // Save the updated score
       return res.status(400).json({
-        message: `Cannot add more ${playerCategory} players. Maximum limit reached.`,
+        error: `Maximum limit reached for ${playerCategory} players`,
       });
     }
 
@@ -205,12 +202,11 @@ export const assignPlayer = async (req, res) => {
     const alreadySold = player.finalPrice.some(
       (entry) => entry.slot_num.toString() === selectedSlot.toString()
     );
-    console.log(`alreadySold : ${alreadySold}`);
 
     if (alreadySold) {
-      console.log("Hagg diya hehe");
-
-      return res.status(400).json({ msg: "Player already sold in this slot" });
+      return res
+        .status(400)
+        .json({ error: "Player already sold in this slot" });
     }
 
     // Assign the player since they are within limits
@@ -222,10 +218,14 @@ export const assignPlayer = async (req, res) => {
     player.finalPrice.push({ slot_num: selectedSlot, price: finalPrice });
     await player.save();
 
-    return res.status(200).json({ message: "Player assigned successfully" });
+    return res.status(200).json({
+      message: "Player assigned successfully",
+      playerName: player.name,
+      teamName: selectedUser.name || "Selected team",
+    });
   } catch (err) {
     console.log("Error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ error: "Server error" });
   }
 };
 

@@ -90,9 +90,7 @@ export const assignPowerCard = async (req, res) => {
   );
   const slotAlreadyContainsSameCard = powercard.assignedTo.reduce(
     (accumulator, curr) => {
-      return (
-        curr.slot == selectedSlot || accumulator
-      );
+      return curr.slot == selectedSlot || accumulator;
     },
     false
   );
@@ -101,9 +99,11 @@ export const assignPowerCard = async (req, res) => {
   if (userAlreadyContainsSameCard) {
     return res.status(400).json({ msg: "User already contains the card" });
   }
-  
+
   if (slotAlreadyContainsSameCard) {
-    return res.status(400).json({ msg: "Slot already contains the card in another team" });
+    return res
+      .status(400)
+      .json({ msg: "Slot already contains the card in another team" });
   }
 
   if (user.Purse < finalPrice) {
@@ -136,12 +136,12 @@ export const usedPowerCard = async (req, res) => {
     ipl_team_id: selectedTeam,
   });
   if (!user) {
-    return res.status(404).json({ msg: "User not found..." });
+    return res.status(404).json({ msg: "User not found." });
   }
 
   const powercard = await PowerCard.findOne({ _id: cardId });
   if (!powercard) {
-    return res.status(404).json({ msg: "Powercard not found..." });
+    return res.status(404).json({ msg: "Powercard not found." });
   }
 
   const ifTeamContainsPowercard = powercard.assignedTo.reduce(
@@ -152,7 +152,9 @@ export const usedPowerCard = async (req, res) => {
   );
 
   if (!ifTeamContainsPowercard) {
-    return res.status(400).json({ msg: "Team does not contain the powercard" });
+    return res
+      .status(400)
+      .json({ msg: "Team does not contain the powercard." });
   }
 
   const ifAlreadyUsed = powercard.assignedTo.reduce((accumulator, curr) => {
@@ -169,7 +171,7 @@ export const usedPowerCard = async (req, res) => {
     user.save();
     return res
       .status(400)
-      .json({ msg: "This powercard has already been used by this player..." });
+      .json({ msg: "This powercard has already been used by this player." });
   }
 
   powercard.assignedTo.forEach((curr) => {
@@ -190,15 +192,16 @@ export const getPowerCardsByUserId = async (req, res) => {
       _id: userId,
     });
     if (!user) {
-      return res.status(404).json({ msg: "User not found..." });
+      return res.status(404).json({ msg: "User not found." });
     }
     const pcs_ids = user.power_card_id;
-    let powerCards = await PowerCard.find({ _id : { $in: pcs_ids } });
+    let powerCards = await PowerCard.find({ _id: { $in: pcs_ids } });
     console.log(pcs_ids);
     res.status(200).json(powerCards);
   } catch (err) {
     console.error(err);
-    return res.status(500)
+    return res
+      .status(500)
       .json({ msg: "Error in powercard fetching for a user." });
   }
 };

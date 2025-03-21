@@ -12,6 +12,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card } from "./ui/card";
 import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 
 const UnassignPowerCard = () => {
   const [players, setPlayers] = useState([]);
@@ -19,16 +20,23 @@ const UnassignPowerCard = () => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const playersRes = await getPowerCards();
       const teamsRes = await getTeams();
       setPlayers(playersRes.data);
       setTeams(teamsRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
+      toast.error("Failed to load data", {
+        description: error.response?.data?.msg || "Please try again later",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,76 +49,124 @@ const UnassignPowerCard = () => {
     }
   }, [router]);
 
-  const handleUnassignPlayer = async () => {
-    if (!selectedTeam || !selectedSlot || !selectedPlayer) return;
+  const handleUsePowerCard = async () => {
+    if (!selectedTeam || !selectedSlot || !selectedPlayer) {
+      toast.error("Missing information", {
+        description: "Please select a powercard, team, and enter a slot",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
       const response = await usedPowerCard(selectedPlayer, {
         selectedSlot,
         selectedTeam,
       });
-      fetchData(); // Refresh users after update
-      return response.status;
+
+      // Get the names for better user feedback
+      const powerCardName =
+        players.find((player) => player._id === selectedPlayer)?.name ||
+        "Unknown";
+      const teamName =
+        teams.find((team) => team._id === selectedTeam)?.name || "Unknown";
+
+      toast.success("Powercard used successfully", {
+        description: `${powerCardName} has been used by team ${teamName} in slot ${selectedSlot}`,
+      });
+
+      // Reset form fields
+      setSelectedPlayer(null);
+      setSelectedSlot("");
+      setSelectedTeam(null);
+
+      // Refresh data
+      fetchData();
+
+      return response;
     } catch (error) {
-      console.error("Error unassigning player:", error);
+      // Extract error message from response.data.msg
+      const errorMessage =
+        error.response?.data?.msg || "Failed to use powercard";
+
+      toast.error("Error using powercard", {
+        description: errorMessage,
+        icon: <AlertCircle className="h-5 w-5 text-red-500" />,
+      });
+
+      console.error("Error details:", error);
+      return error.response;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Card className="p-4 shadow-md rounded-lg w-1/2">
-      <h3 className="text-xl font-semibold mb-4">Used Powercard</h3>
+    <Card className="p-4 shadow-md rounded-lg w-1/2 mx-auto">
+      <h3 className="text-xl font-semibold mb-4">Use Powercard</h3>
       <div className="flex flex-col gap-5">
-        <Input
-          type="text"
-          placeholder="Enter slot"
-          value={selectedSlot}
-          onChange={(e) => setSelectedSlot(e.target.value)}
-        />
-        <Select onValueChange={setSelectedTeam} className="mt-4">
-          <SelectTrigger>
-            <SelectValue placeholder="Select a team" />
-          </SelectTrigger>
-          <SelectContent className="bg-card">
-            {teams.map((team) => (
-              <SelectItem key={team._id} value={team._id}>
-                {team.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select onValueChange={setSelectedPlayer}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a powercard" />
-          </SelectTrigger>
-          <SelectContent className="bg-card">
-            {players.map((player) => (
-              <SelectItem key={player._id} value={player._id}>
-                {player.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="space-y-2">
+          <label htmlFor="powercard-select" className="text-sm font-medium">
+            Select Powercard
+          </label>
+          <Select
+            onValueChange={setSelectedPlayer}
+            value={selectedPlayer || ""}
+          >
+            <SelectTrigger id="powercard-select" className="w-full">
+              <SelectValue placeholder="Select a powercard" />
+            </SelectTrigger>
+            <SelectContent className="bg-card">
+              {players.map((player) => (
+                <SelectItem key={player._id} value={player._id}>
+                  {player.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="team-select" className="text-sm font-medium">
+            Select Team
+          </label>
+          <Select onValueChange={setSelectedTeam} value={selectedTeam || ""}>
+            <SelectTrigger id="team-select" className="w-full">
+              <SelectValue placeholder="Select a team" />
+            </SelectTrigger>
+            <SelectContent className="bg-card">
+              {teams.map((team) => (
+                <SelectItem key={team._id} value={team._id}>
+                  {team.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="slot-input" className="text-sm font-medium">
+            Slot
+          </label>
+          <Input
+            id="slot-input"
+            type="text"
+            placeholder="Enter slot"
+            value={selectedSlot}
+            onChange={(e) => setSelectedSlot(e.target.value)}
+          />
+        </div>
       </div>
+
       <Button
-        className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-        onClick={async () => {
-          const response = await handleUnassignPlayer();
-          if (response === 200 || response === 204) {
-            toast("Player unassigned", {
-              description: `${
-                players.find((player) => player._id === selectedPlayer)?.name
-              } has been unassigned from team ${
-                teams.find((team) => team._id === selectedTeam)?.name ||
-                "Unknown User"
-              } in slot ${selectedSlot}`,
-            });
-          } else {
-            toast("Could not unassign player", {
-              description: `Error occurred while unassigning player`,
-            });
-          }
-        }}
+        className="mt-6 w-full bg-red-500 hover:bg-red-600 text-white"
+        onClick={handleUsePowerCard}
+        disabled={
+          isLoading || !selectedPlayer || !selectedTeam || !selectedSlot
+        }
       >
-        Use Powercard
+        {isLoading ? "Processing..." : "Use Powercard"}
       </Button>
     </Card>
   );

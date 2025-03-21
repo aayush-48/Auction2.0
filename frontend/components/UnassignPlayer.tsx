@@ -108,7 +108,7 @@ const UnassignPlayer = () => {
             });
           } else {
             toast("Could not unassign player", {
-              description: `Error occurred while unassigning player`,
+              description: `Player not assigned to this user.`,
             });
           }
         }}
