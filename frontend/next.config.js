@@ -9,11 +9,12 @@ const nextConfig = {
   reactStrictMode: true,
   env: {
     NEXT_PUBLIC_API_URL: "https://aution2-0.onrender.com/api",
-    // NEXT_PUBLIC_API_URL: "http://localhost:5001/api",
+    //NEXT_PUBLIC_API_URL: "http://localhost:5001/api",
   },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "s.yimg.com" },
+      { protocol: "https", hostname: "in.images.search.yahoo.com" },
       { protocol: "https", hostname: "e0.pxfuel.com" },
       { protocol: "https", hostname: "static.indiatv.in" },
       { protocol: "https", hostname: "www.vhv.rs" },
