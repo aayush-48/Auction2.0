@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   role: { type: String, required: true },
 });
 
-userSchema.pre('save', async function () {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     // If the password is not modified, skip hashing
     return next();
