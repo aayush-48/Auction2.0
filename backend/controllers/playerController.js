@@ -99,8 +99,8 @@ export const assignPlayer = async (req, res) => {
       slot_num: selectedSlot,
     });
     //console.log(selectedUser.player_ids.length >= 11);
-    
-    if(selectedUser.player_ids.length >= 11){
+
+    if (selectedUser.player_ids.length >= 11) {
       return res
         .status(400)
         .json({ message: "Cannot have more than 11 players re baba..." });
@@ -206,13 +206,12 @@ export const assignPlayer = async (req, res) => {
       (entry) => entry.slot_num.toString() === selectedSlot.toString()
     );
     console.log(`alreadySold : ${alreadySold}`);
-    
+
     if (alreadySold) {
       console.log("Hagg diya hehe");
-      
+
       return res.status(400).json({ msg: "Player already sold in this slot" });
     }
-
 
     // Assign the player since they are within limits
     selectedUser.player_ids.push(playerId);
@@ -272,7 +271,7 @@ export const unassignPlayer = async (req, res) => {
 
     if (slotPriceEntry) {
       // Refund the amount to the user's balance
-      selectedUser.balance += slotPriceEntry.price; // Assuming 'price' stores the final price
+      selectedUser.Purse += Number(slotPriceEntry.price); // Assuming 'price' stores the final price
 
       // Remove the price entry from player's finalPrice
       player.finalPrice = player.finalPrice.filter(
