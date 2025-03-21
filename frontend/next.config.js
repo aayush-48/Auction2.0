@@ -18,6 +18,8 @@ const nextConfig = {
       { protocol: "https", hostname: "e0.pxfuel.com" },
       { protocol: "https", hostname: "static.indiatv.in" },
       { protocol: "https", hostname: "www.vhv.rs" },
+      { protocol: "https", hostname: "upload.wikipedia.org" },
+
       {
         protocol: "https",
         hostname: "iplcricbet.com",
