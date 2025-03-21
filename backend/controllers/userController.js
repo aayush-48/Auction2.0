@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import PowerCard from "../models/PowerCard.js";
 import cookie from "cookie";
+import bcrypt from "bcryptjs"
 
 export const getUsers = async (req, res) => {
   try {
@@ -28,18 +29,21 @@ export const getUserById = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    const user = new User(req.body);
+    const user = await User.create(req.body);
+    const token = user.createJWT()
+    console.log(token);
+    
     console.log(user);
     const powerCard = await PowerCard.findOne({name : "RTM"})
     powerCard.assignedTo.push({
-      slot : req.body.solt_num,
+      slot : req.body.slot_num,
       user : user._id,
       cost : 0,
       used : false
     })
     powerCard.save()
-    user.save();
-    res.status(201).json(user);
+    // user.save();
+    res.status(201).json({user , token});
   } catch (error) {
     console.error("Error:", error);
     res.status(400).json({ message: "Invalid User data" });
