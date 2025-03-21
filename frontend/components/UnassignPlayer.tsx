@@ -107,7 +107,7 @@ const UnassignPlayer = () => {
               } in slot ${selectedSlot}`,
             });
           } else {
-            toast("Could not unassign player", {
+            toast.error("Could not unassign player", {
               description: `Player not assigned to this user.`,
             });
           }

@@ -116,8 +116,6 @@ const AssignPlayer = () => {
       });
 
       // Reset fields
-      setSelectedPlayer(null);
-      setSelectedSlot("");
       setFinalPrice("");
 
       fetchData(); // Refresh data
@@ -126,7 +124,7 @@ const AssignPlayer = () => {
       console.error("Error assigning player:", error);
       const errorMessage =
         error.response?.data?.error || "Failed to assign player";
-      toast("Error", {
+      toast.error("Error", {
         description: errorMessage,
       });
       return error.response;

@@ -99,16 +99,15 @@ export const assignPlayer = async (req, res) => {
       slot_num: selectedSlot,
     });
 
-    if (selectedUser.player_ids.length >= 11) {
-      return res.status(400).json({ error: "Team already has 11 players" });
-    }
-
     if (!selectedUser) {
       return res
         .status(400)
         .json({ error: "User not found for selected team and slot" });
     }
 
+    if (selectedUser.player_ids.length >= 11) {
+      return res.status(400).json({ error: "Team already has 11 players" });
+    }
     if (finalPrice > selectedUser.Purse) {
       return res.status(400).json({ error: "Insufficient purse value" });
     }

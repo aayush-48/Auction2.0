@@ -192,7 +192,7 @@ const AssignTeam = () => {
                 } in slot ${selectedSlot}`,
               });
             } else {
-              toast("Could not assign team", {
+              toast.error("Could not assign team", {
                 description: `Error occurred while assigning team`,
               });
             }

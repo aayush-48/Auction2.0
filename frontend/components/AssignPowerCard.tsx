@@ -180,8 +180,8 @@ const AssignPowerCard = () => {
               } in slot ${selectedSlot}`,
             });
           } else {
-            toast("Could not assign player", {
-              description: `Error occurred while assigning player`,
+            toast.error("Could not assign powercard", {
+              description: `Error occurred while assigning powercard`,
             });
           }
         }}
