@@ -124,8 +124,6 @@ export default function Dashboard() {
     return sum + Number(slotPrice);
   }, 0);
 
-  const remainingPurse = Math.max(0, purse - teamValue);
-
   const PlayerSection = ({
     title,
     players,
@@ -178,7 +176,8 @@ export default function Dashboard() {
             key={pc._id}
             name={pc.name}
             description={pc.description}
-            isUsed={false}
+            assignedTo={pc.assignedTo}
+            userId={user._id}
           />
         ))}
       </div>

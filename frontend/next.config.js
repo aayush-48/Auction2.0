@@ -14,9 +14,12 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "s.yimg.com" },
+      { protocol: "https", hostname: "in.images.search.yahoo.com" },
       { protocol: "https", hostname: "e0.pxfuel.com" },
       { protocol: "https", hostname: "static.indiatv.in" },
       { protocol: "https", hostname: "www.vhv.rs" },
+      { protocol: "https", hostname: "upload.wikimedia.org" },
+
       {
         protocol: "https",
         hostname: "iplcricbet.com",
