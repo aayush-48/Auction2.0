@@ -20,7 +20,7 @@ router
   .get(getTeamById)
   .put(protect, admin, updateTeam)
   .delete(protect, admin, deleteTeam);
-router.route("/assign/:id").post(protect, admin, assignTeam);
+router.route("/assign/:id").post( assignTeam);
 router.route("/purse/:id").get(getTeamPurse);
 router.route("/slot/:slot").get(getTeamsOfSlot);
 router.route("/players/:id").get(getPlayersByTeam);

@@ -80,7 +80,7 @@ export const assignTeam = async (req, res) => {
       slot_num 
     })
 
-    // console.log(otherTeamsWithSameIdInSameSlot);
+    console.log(otherTeamsWithSameIdInSameSlot);
 
     if(otherTeamsWithSameIdInSameSlot.length != 0){
       return res.status(400).json({
