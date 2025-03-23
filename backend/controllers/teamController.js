@@ -186,3 +186,25 @@ export const getTeamPurse = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const leaderboard = async(req , res)=>{
+  try{
+    
+    var users= await User.find().sort({Score : -1});
+    console.log("In here");
+    return res.status(200).json({leaderboard : users}) 
+  } catch(e){
+    return res.status(400).json({msg : "Failed to get leaderboard"})
+  }
+}
+
+export const leaderboardslot = async(req , res)=>{
+  try{
+    const {slot : slot_num} = req.params
+    console.log(slot_num);
+    var users= await User.find({slot_num}).sort({Score : -1});
+    return res.status(200).json({leaderboard : users}) 
+  } catch(e){
+    return res.status(400).json({msg : "Failed to get leaderboard"})
+  }
+}

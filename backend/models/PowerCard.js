@@ -5,7 +5,7 @@ const powerCardSchema = new mongoose.Schema({
   description: { type: String, required: true },
   effect: { type: String },
   assignedTo: [{user:{ type: mongoose.Schema.Types.ObjectId, ref: "User" },
-              slot : {type:Number , enum:[1,2,3,4,5,6]},
+              slot : {type:Number , enum:[1,2,3,4,5,6,7]},
               used : {type : Boolean},
               cost : {type : Number}
   }],
